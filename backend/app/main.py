@@ -1,12 +1,65 @@
 from fastapi import FastAPI
 
-app = FastAPI(
-    title="AI Database Copilot",
-    version="1.0.0"
+from .config import settings
+from .database import (
+    app_engine,
+    check_database_connection,
+    reader_engine,
 )
 
-@app.get("/")
-def home():
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description=(
+        "Convert natural language into safe SQL, execute queries, "
+        "explain results and generate visualizations."
+    ),
+)
+
+
+@app.get("/", tags=["General"])
+def home() -> dict:
+    """Application home endpoint."""
+
     return {
-        "message": "AI Database Copilot"
+        "message": "AI Database Copilot",
+        "version": settings.APP_VERSION,
+    }
+
+
+@app.get("/health", tags=["Health"])
+def health_check() -> dict:
+    """FastAPI application health test."""
+
+    return {
+        "status": "healthy",
+        "service": settings.APP_NAME,
+    }
+
+
+@app.get("/health/databases", tags=["Health"])
+def database_health_check() -> dict:
+    """দুইটি MySQL database connection পরীক্ষা করবে."""
+
+    app_database_result = check_database_connection(app_engine)
+    reader_database_result = check_database_connection(reader_engine)
+
+    app_connected = app_database_result["status"] == "connected"
+    reader_connected = reader_database_result["status"] == "connected"
+
+    overall_status = (
+        "healthy"
+        if app_connected and reader_connected
+        else "degraded"
+    )
+
+    return {
+        "status": overall_status,
+        "app_database": app_database_result["status"],
+        "reader_database": reader_database_result["status"],
+        "details": {
+            "app_database": app_database_result,
+            "reader_database": reader_database_result,
+        },
     }
