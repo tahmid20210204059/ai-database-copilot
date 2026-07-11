@@ -5,12 +5,20 @@ from typing import Any
 
 from google import genai
 
+
 from ..config import settings
+
 from ..schemas.ai import AIGeneratedResponse
+
 from ..utils.prompt_loader import load_prompt
+
+from ..parsers.json_parser import json_parser
+
 
 
 logger = logging.getLogger(__name__)
+
+
 
 
 class GeminiAIService:
@@ -21,9 +29,11 @@ class GeminiAIService:
     - Create Gemini client
     - Build prompts
     - Generate responses
-    - Retry temporary failures
-    - Validate AI output
+
+    Parsing responsibility is handled by:
+    JSON Parser Layer
     """
+
 
 
     def __init__(self):
@@ -32,14 +42,10 @@ class GeminiAIService:
             "Initializing Gemini client"
         )
 
+
         logger.info(
             "Gemini model: %s",
             settings.GEMINI_MODEL,
-        )
-
-        logger.info(
-            "Gemini key prefix: %s",
-            settings.GEMINI_API_KEY[:10],
         )
 
 
@@ -50,7 +56,9 @@ class GeminiAIService:
 
         self.model = settings.GEMINI_MODEL
 
+
         self.max_retries = 3
+
 
 
 
@@ -70,19 +78,18 @@ class GeminiAIService:
         )
 
 
-        response_text = self._call_gemini(
+        raw_response = self._call_gemini(
             prompt
         )
 
 
-        parsed_response = self._parse_response(
-            response_text
+        parsed_response = json_parser.parse(
+            raw_response
         )
 
 
-        return AIGeneratedResponse(
-            **parsed_response
-        )
+        return parsed_response
+
 
 
 
@@ -92,7 +99,7 @@ class GeminiAIService:
         user_prompt: str,
     ) -> str:
         """
-        Build final Gemini prompt.
+        Build Gemini prompt.
         """
 
 
@@ -112,15 +119,13 @@ class GeminiAIService:
 
 
 
+
     def _call_gemini(
         self,
         prompt: str,
     ) -> str:
         """
-        Call Gemini API with retry support.
-
-        Temporary simplified configuration
-        for API validation.
+        Call Gemini API with retry.
         """
 
 
@@ -135,7 +140,7 @@ class GeminiAIService:
             try:
 
                 logger.info(
-                    "Gemini request attempt %s",
+                    "Gemini attempt %s",
                     attempt,
                 )
 
@@ -150,13 +155,8 @@ class GeminiAIService:
                 if not response.text:
 
                     raise RuntimeError(
-                        "Gemini returned empty response"
+                        "Empty Gemini response"
                     )
-
-
-                logger.info(
-                    "Gemini response received successfully"
-                )
 
 
                 return response.text
@@ -165,12 +165,12 @@ class GeminiAIService:
 
             except Exception as error:
 
+
                 last_error = error
 
 
                 logger.warning(
-                    "Gemini attempt %s failed: %s",
-                    attempt,
+                    "Gemini attempt failed: %s",
                     error,
                 )
 
@@ -187,72 +187,6 @@ class GeminiAIService:
             f"Gemini request failed: {last_error}"
         )
 
-
-
-    def _parse_response(
-        self,
-        response_text: str,
-    ) -> dict:
-        """
-        Parse Gemini JSON response.
-        """
-
-
-        cleaned = response_text.strip()
-
-
-        if cleaned.startswith(
-            "```"
-        ):
-
-            cleaned = (
-                cleaned
-                .replace(
-                    "```json",
-                    "",
-                )
-                .replace(
-                    "```",
-                    "",
-                )
-                .strip()
-            )
-
-
-        try:
-
-            data = json.loads(
-                cleaned
-            )
-
-
-        except json.JSONDecodeError as error:
-
-            raise RuntimeError(
-                f"Invalid Gemini JSON response: {error}"
-            )
-
-
-
-        required_fields = [
-            "sql",
-            "summary",
-            "confidence",
-            "tables_used",
-            "read_only",
-        ]
-
-
-        for field in required_fields:
-
-            if field not in data:
-
-                raise RuntimeError(
-                    f"Missing AI response field: {field}"
-                )
-
-
-        return data
 
 
 

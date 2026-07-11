@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from .api.routes.connections import router as connection_router
 from .api.routes.schema import router as schema_router
+from .api.routes.history import router as history_router
 
 from .api.routes.auth import router as auth_router
 from .api.routes.ai import router as ai_router
+from .api.routes.explanation import router as explanation_router
 from .config import settings
 from .database import (
     app_engine,
@@ -26,7 +28,8 @@ app.include_router(auth_router)
 app.include_router(connection_router)
 app.include_router(schema_router)
 app.include_router(ai_router)
-
+app.include_router(history_router)
+app.include_router(explanation_router)
 
 @app.get("/", tags=["General"])
 def home() -> dict:

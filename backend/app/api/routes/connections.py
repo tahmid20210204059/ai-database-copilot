@@ -15,6 +15,7 @@ from ...schemas.connection import (
     ConnectionResponse,
 )
 from ...services.connection_service import (
+    DuplicateConnectionError,
     connection_service,
 )
 
@@ -75,11 +76,20 @@ def create_connection(
     """
 
 
-    connection = connection_service.create_connection(
-        database=database,
-        user_id=current_user.id,
-        connection_data=connection_data,
-    )
+    try:
+        connection = connection_service.create_connection(
+            database=database,
+            user_id=current_user.id,
+            connection_data=connection_data,
+        )
+    except DuplicateConnectionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Connection with this name already exists",
+        ) from exc
+    except Exception as exc:
+        print('CREATE_CONNECTION_EXCEPTION', repr(exc))
+        raise
 
 
     return connection

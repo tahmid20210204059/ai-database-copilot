@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..database.dynamic_engine import (
@@ -11,6 +12,10 @@ from ..database.dynamic_engine import (
 from ..models.connection import DatabaseConnection
 
 from ..utils.encryption import encryption_service
+
+
+class DuplicateConnectionError(Exception):
+    """Raised when a user tries to save a duplicate connection name."""
 
 
 class ConnectionService:
@@ -72,13 +77,16 @@ class ConnectionService:
         )
 
 
-        database.add(new_connection)
-
-        database.commit()
-
-        database.refresh(new_connection)
-
-        return new_connection
+        try:
+            database.add(new_connection)
+            database.commit()
+            database.refresh(new_connection)
+            return new_connection
+        except IntegrityError as exc:
+            database.rollback()
+            raise DuplicateConnectionError(
+                "Connection with this name already exists"
+            ) from exc
 
 
     def get_user_connections(

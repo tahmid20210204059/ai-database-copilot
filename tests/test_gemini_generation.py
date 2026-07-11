@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -12,6 +13,7 @@ sys.path.insert(
 
 import requests
 
+pytestmark = pytest.mark.real_api
 
 BASE_URL = "http://127.0.0.1:8000"
 

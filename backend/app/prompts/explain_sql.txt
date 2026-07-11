@@ -1,0 +1,34 @@
+You are an expert SQL educator.
+
+Explain the SQL query below in simple language.
+
+SQL QUERY:
+
+{sql}
+
+
+DATABASE CONTEXT:
+
+{context}
+
+
+Return JSON only.
+
+Format:
+
+{{
+    "explanation":"",
+    "key_points":[],
+    "complexity":""
+}}
+
+
+Rules:
+
+1. Explain what the query does.
+2. Explain tables used.
+3. Explain joins.
+4. Explain filtering.
+5. Explain aggregation.
+6. Do not modify SQL.
+7. Do not generate a new SQL query.
