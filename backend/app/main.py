@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from .api.routes.auth import router as auth_router
 from .config import settings
 from .database import (
     app_engine,
@@ -18,12 +19,15 @@ app = FastAPI(
 )
 
 
+app.include_router(auth_router)
+
+
 @app.get("/", tags=["General"])
 def home() -> dict:
     """Application home endpoint."""
 
     return {
-        "message": "AI Database Copilot",
+        "message": settings.APP_NAME,
         "version": settings.APP_VERSION,
     }
 
@@ -42,11 +46,21 @@ def health_check() -> dict:
 def database_health_check() -> dict:
     """দুইটি MySQL database connection পরীক্ষা করবে."""
 
-    app_database_result = check_database_connection(app_engine)
-    reader_database_result = check_database_connection(reader_engine)
+    app_database_result = check_database_connection(
+        app_engine
+    )
 
-    app_connected = app_database_result["status"] == "connected"
-    reader_connected = reader_database_result["status"] == "connected"
+    reader_database_result = check_database_connection(
+        reader_engine
+    )
+
+    app_connected = (
+        app_database_result["status"] == "connected"
+    )
+
+    reader_connected = (
+        reader_database_result["status"] == "connected"
+    )
 
     overall_status = (
         "healthy"
