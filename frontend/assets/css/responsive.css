@@ -1,0 +1,115 @@
+/*
+========================================
+AI DATABASE COPILOT
+RESPONSIVE SYSTEM
+========================================
+*/
+
+
+/* Tablet */
+
+@media (max-width: 1024px) {
+
+
+    h1 {
+
+        font-size:28px;
+
+    }
+
+
+    h2 {
+
+        font-size:22px;
+
+    }
+
+
+    .card {
+
+        padding:16px;
+
+    }
+
+
+}
+
+
+
+/* Mobile */
+
+@media (max-width:768px) {
+
+
+    body {
+
+        font-size:14px;
+
+    }
+
+
+
+    h1 {
+
+        font-size:24px;
+
+    }
+
+
+
+    h2 {
+
+        font-size:20px;
+
+    }
+
+
+
+    .card {
+
+        padding:14px;
+
+    }
+
+
+
+    .btn {
+
+        width:100%;
+
+    }
+
+
+
+    .table-wrapper {
+
+        overflow-x:auto;
+
+    }
+
+
+}
+
+
+
+/* Small Mobile */
+
+@media (max-width:480px) {
+
+
+    h1 {
+
+        font-size:22px;
+
+    }
+
+
+
+    .card-value {
+
+        font-size:22px;
+
+    }
+
+
+}
