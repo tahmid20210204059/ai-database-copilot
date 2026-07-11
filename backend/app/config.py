@@ -23,9 +23,12 @@ class Settings:
 
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
     )
+
+    FERNET_KEY: str = os.getenv("FERNET_KEY", "")
 
     def validate(self) -> None:
         """Required environment variables পরীক্ষা করবে."""
@@ -40,6 +43,9 @@ class Settings:
 
         if not self.JWT_SECRET_KEY:
             missing_variables.append("JWT_SECRET_KEY")
+
+        if not self.FERNET_KEY:
+            missing_variables.append("FERNET_KEY")
 
         if missing_variables:
             missing_text = ", ".join(missing_variables)

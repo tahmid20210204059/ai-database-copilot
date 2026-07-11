@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from .api.routes.connections import router as connection_router
 
 from .api.routes.auth import router as auth_router
 from .config import settings
@@ -20,6 +21,7 @@ app = FastAPI(
 
 
 app.include_router(auth_router)
+app.include_router(connection_router)
 
 
 @app.get("/", tags=["General"])
