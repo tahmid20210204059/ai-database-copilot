@@ -8,16 +8,21 @@ from fastapi import (
 from sqlalchemy.orm import Session
 
 from ...auth.jwt_handler import get_current_user
+
 from ...database import get_app_db
+
 from ...models.user import User
+
 from ...schemas.connection import (
     ConnectionCreate,
     ConnectionResponse,
 )
+
 from ...services.connection_service import (
     DuplicateConnectionError,
     connection_service,
 )
+
 
 
 router = APIRouter(
@@ -26,18 +31,14 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/test",
-)
+
+
+
+@router.post("/test")
 def test_connection(
     connection_data: ConnectionCreate,
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Test external database connection.
-    Database information save করবে না।
-    """
-
 
     result = connection_service.test_connection(
         host=connection_data.host,
@@ -60,6 +61,8 @@ def test_connection(
 
 
 
+
+
 @router.post(
     "",
     response_model=ConnectionResponse,
@@ -70,29 +73,28 @@ def create_connection(
     database: Session = Depends(get_app_db),
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Save new database connection.
-    Password encrypted হয়ে save হবে।
-    """
-
 
     try:
-        connection = connection_service.create_connection(
-            database=database,
-            user_id=current_user.id,
-            connection_data=connection_data,
+
+        connection = (
+            connection_service.create_connection(
+                database=database,
+                user_id=current_user.id,
+                connection_data=connection_data,
+            )
         )
+
     except DuplicateConnectionError as exc:
+
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Connection with this name already exists",
         ) from exc
-    except Exception as exc:
-        print('CREATE_CONNECTION_EXCEPTION', repr(exc))
-        raise
 
 
     return connection
+
+
 
 
 
@@ -104,12 +106,8 @@ def get_connections(
     database: Session = Depends(get_app_db),
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Current user-এর সব database connections return করবে।
-    """
 
-
-    connections = (
+    return (
         connection_service.get_user_connections(
             database=database,
             user_id=current_user.id,
@@ -117,7 +115,42 @@ def get_connections(
     )
 
 
-    return connections
+
+
+
+@router.put(
+    "/{connection_id}",
+    response_model=ConnectionResponse,
+)
+def update_connection(
+    connection_id: int,
+    connection_data: ConnectionCreate,
+    database: Session = Depends(get_app_db),
+    current_user: User = Depends(get_current_user),
+):
+
+
+    updated = (
+        connection_service.update_connection(
+            database=database,
+            connection_id=connection_id,
+            user_id=current_user.id,
+            connection_data=connection_data,
+        )
+    )
+
+
+    if not updated:
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Connection not found",
+        )
+
+
+    return updated
+
+
 
 
 
@@ -129,11 +162,6 @@ def delete_connection(
     database: Session = Depends(get_app_db),
     current_user: User = Depends(get_current_user),
 ):
-    """
-    User নিজের connection delete করতে পারবে।
-    অন্য user-এর connection delete করা যাবে না।
-    """
-
 
     deleted = (
         connection_service.delete_connection(
@@ -153,5 +181,6 @@ def delete_connection(
 
 
     return {
-        "message": "Connection deleted successfully"
+        "message":
+        "Connection deleted successfully"
     }

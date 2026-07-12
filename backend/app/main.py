@@ -1,17 +1,21 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from .api.routes.connections import router as connection_router
 from .api.routes.schema import router as schema_router
 from .api.routes.history import router as history_router
-
 from .api.routes.auth import router as auth_router
 from .api.routes.ai import router as ai_router
 from .api.routes.explanation import router as explanation_router
+
 from .config import settings
+
 from .database import (
     app_engine,
     check_database_connection,
     reader_engine,
 )
+
 
 
 app = FastAPI(
@@ -24,6 +28,22 @@ app = FastAPI(
 )
 
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+
+
 app.include_router(auth_router)
 app.include_router(connection_router)
 app.include_router(schema_router)
@@ -31,9 +51,12 @@ app.include_router(ai_router)
 app.include_router(history_router)
 app.include_router(explanation_router)
 
+
+
+
+
 @app.get("/", tags=["General"])
 def home() -> dict:
-    """Application home endpoint."""
 
     return {
         "message": settings.APP_NAME,
@@ -41,9 +64,11 @@ def home() -> dict:
     }
 
 
+
+
+
 @app.get("/health", tags=["Health"])
 def health_check() -> dict:
-    """FastAPI application health test."""
 
     return {
         "status": "healthy",
@@ -51,9 +76,11 @@ def health_check() -> dict:
     }
 
 
+
+
+
 @app.get("/health/databases", tags=["Health"])
 def database_health_check() -> dict:
-    """দুইটি MySQL database connection পরীক্ষা করবে."""
 
     app_database_result = check_database_connection(
         app_engine
@@ -63,13 +90,16 @@ def database_health_check() -> dict:
         reader_engine
     )
 
+
     app_connected = (
         app_database_result["status"] == "connected"
     )
 
+
     reader_connected = (
         reader_database_result["status"] == "connected"
     )
+
 
     overall_status = (
         "healthy"
@@ -77,12 +107,21 @@ def database_health_check() -> dict:
         else "degraded"
     )
 
+
     return {
+
         "status": overall_status,
+
         "app_database": app_database_result["status"],
+
         "reader_database": reader_database_result["status"],
+
         "details": {
+
             "app_database": app_database_result,
+
             "reader_database": reader_database_result,
+
         },
+
     }

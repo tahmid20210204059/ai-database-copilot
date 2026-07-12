@@ -11,6 +11,7 @@
 Database Connections
 </title>
 
+
 <link rel="stylesheet" href="../assets/css/main.css">
 
 <link rel="stylesheet" href="../assets/css/layout.css">
@@ -20,6 +21,7 @@ Database Connections
 <link rel="stylesheet" href="../assets/css/effects.css">
 
 <link rel="stylesheet" href="../assets/css/common-background.css">
+
 
 </head>
 
@@ -31,7 +33,46 @@ Database Connections
 
 
 
-<div class="page-content">
+<div class="app-container">
+
+
+
+<div 
+data-component="sidebar"
+data-replace="true">
+</div>
+
+
+
+
+
+<div class="main-area">
+
+
+
+<div 
+data-component="navbar"
+data-title="Database Connections"
+data-avatar="JD"
+data-replace="true">
+</div>
+
+
+
+
+
+
+
+<div class="content-wrapper">
+
+
+<main class="page-content">
+
+
+
+
+
+<section class="hero">
 
 
 <h1>
@@ -40,35 +81,245 @@ Database Connections
 
 
 <p>
-Manage your enterprise database connections.
+Manage, test and securely store your enterprise database connections.
 </p>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="dashboard-grid">
+
+
+
+<div class="ui-card premium-hover">
+
+
+<div class="ui-card-title">
+
+Total Connections
+
+</div>
+
+
+<div class="ui-card-value" id="totalConnections">
+
+0
+
+</div>
+
+
+<p>
+Saved databases
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="ui-card premium-hover">
+
+
+<div class="ui-card-title">
+
+Connection Status
+
+</div>
+
+
+<div class="ui-card-value">
+
+Ready
+
+</div>
+
+
+<p>
+Database monitoring active
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="ui-card premium-hover">
+
+
+<div class="ui-card-title">
+
+Supported Engine
+
+</div>
+
+
+<div class="ui-card-value">
+
+MySQL
+
+</div>
+
+
+<p>
+Enterprise database support
+</p>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section">
+
+
+<h2>
+Add Database Connection
+</h2>
 
 
 
 <div class="ui-card">
 
 
-<h3>
-Enterprise Sales Database
-</h3>
+<form id="connectionForm">
 
 
-<p>
-Status:
-
-<span class="badge badge-success">
-
-Connected
-
-</span>
-
-</p>
+<label>
+Connection Name
+</label>
 
 
+<input
+class="input"
+id="connection_name"
+type="text"
+placeholder="Enterprise Sales Database"
+required
+>
 
-<button class="ui-btn ui-btn-success">
+
+
+<label>
+Database Name
+</label>
+
+
+<input
+class="input"
+id="database_name"
+type="text"
+placeholder="enterprise_sales"
+required
+>
+
+
+
+<label>
+Host
+</label>
+
+
+<input
+class="input"
+id="host"
+type="text"
+placeholder="localhost"
+required
+>
+
+
+
+<label>
+Port
+</label>
+
+
+<input
+class="input"
+id="port"
+type="number"
+placeholder="3306"
+required
+>
+
+
+
+<label>
+Username
+</label>
+
+
+<input
+class="input"
+id="username"
+type="text"
+placeholder="copilot_reader"
+required
+>
+
+
+
+<label>
+Password
+</label>
+
+
+<input
+class="input"
+id="password"
+type="password"
+placeholder="Database password"
+required
+>
+
+
+
+<div style="margin-top:25px;">
+
+
+<button
+type="button"
+class="ui-btn ui-btn-success"
+id="testConnectionBtn">
 
 Test Connection
+
+</button>
+
+
+
+<button
+type="submit"
+class="ui-btn ui-btn-primary"
+id="saveConnectionBtn">
+
+Save Connection
 
 </button>
 
@@ -77,7 +328,63 @@ Test Connection
 
 
 
-<br>
+</form>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section">
+
+
+<h2>
+Your Databases
+</h2>
+
+
+
+<div
+id="connectionsContainer"
+class="dashboard-grid">
+
+
+<div class="ui-card">
+
+<h3>
+No Connections
+</h3>
+
+<p>
+Add your first database connection to get started.
+</p>
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section">
 
 
 <a href="dashboard.html"
@@ -88,12 +395,94 @@ class="ui-btn ui-btn-primary">
 </a>
 
 
+</section>
+
+
+
+
+
+
+
+
+
+<div id="testModal" class="modal hidden">
+
+
+<div class="ui-card modal-card">
+
+
+<h2>
+Test Connection
+</h2>
+
+
+<input
+class="input"
+id="testPassword"
+type="password"
+placeholder="Enter database password"
+>
+
+
+<div style="margin-top:20px;">
+
+
+<button
+class="ui-btn ui-btn-success"
+id="confirmTestBtn">
+
+Test Connection
+
+</button>
+
+
+
+<button
+class="ui-btn ui-btn-danger"
+onclick="closeTestModal()">
+
+Cancel
+
+</button>
+
+
+</div>
+
+
+</div>
+
 
 </div>
 
 
 
+
+
+</main>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<script src="../assets/js/auth-guard.js"></script>
+
+<script src="../assets/js/components.js"></script>
+
 <script src="../assets/js/common-background.js"></script>
+
+<script src="../assets/js/connections.js"></script>
 
 
 </body>

@@ -46,6 +46,7 @@ class ConnectionService:
         return test_database_connection(engine)
 
 
+
     def create_connection(
         self,
         database: Session,
@@ -65,28 +66,56 @@ class ConnectionService:
 
 
         new_connection = DatabaseConnection(
+
             user_id=user_id,
-            connection_name=connection_data.connection_name,
-            host=connection_data.host,
-            port=connection_data.port,
-            database_name=connection_data.database_name,
-            username=connection_data.username,
-            encrypted_password=encrypted_password,
-            ssl_enabled=connection_data.ssl_enabled,
-            last_tested_at=datetime.now(),
+
+            connection_name=
+            connection_data.connection_name,
+
+            host=
+            connection_data.host,
+
+            port=
+            connection_data.port,
+
+            database_name=
+            connection_data.database_name,
+
+            username=
+            connection_data.username,
+
+            encrypted_password=
+            encrypted_password,
+
+            ssl_enabled=
+            connection_data.ssl_enabled,
+
+            last_tested_at=
+            datetime.now(),
+
         )
 
 
         try:
+
             database.add(new_connection)
+
             database.commit()
+
             database.refresh(new_connection)
+
             return new_connection
+
+
         except IntegrityError as exc:
+
             database.rollback()
+
             raise DuplicateConnectionError(
                 "Connection with this name already exists"
             ) from exc
+
+
 
 
     def get_user_connections(
@@ -94,9 +123,6 @@ class ConnectionService:
         database: Session,
         user_id: int,
     ):
-        """
-        Return only current user's connections.
-        """
 
         query = (
             select(DatabaseConnection)
@@ -112,16 +138,15 @@ class ConnectionService:
 
 
 
-    def delete_connection(
+
+
+    def update_connection(
         self,
         database: Session,
         connection_id: int,
         user_id: int,
+        connection_data,
     ):
-        """
-        Delete connection only if it belongs
-        to current user.
-        """
 
         query = (
             select(DatabaseConnection)
@@ -136,7 +161,78 @@ class ConnectionService:
 
 
         if connection is None:
+
+            return None
+
+
+
+        connection.connection_name = (
+            connection_data.connection_name
+        )
+
+        connection.host = (
+            connection_data.host
+        )
+
+        connection.port = (
+            connection_data.port
+        )
+
+        connection.database_name = (
+            connection_data.database_name
+        )
+
+        connection.username = (
+            connection_data.username
+        )
+
+        connection.encrypted_password = (
+            encryption_service.encrypt(
+                connection_data.password
+            )
+        )
+
+        connection.ssl_enabled = (
+            connection_data.ssl_enabled
+        )
+
+
+        database.commit()
+
+        database.refresh(
+            connection
+        )
+
+
+        return connection
+
+
+
+
+
+    def delete_connection(
+        self,
+        database: Session,
+        connection_id: int,
+        user_id: int,
+    ):
+
+        query = (
+            select(DatabaseConnection)
+            .where(
+                DatabaseConnection.id == connection_id,
+                DatabaseConnection.user_id == user_id,
+            )
+        )
+
+
+        connection = database.scalar(query)
+
+
+        if connection is None:
+
             return False
+
 
 
         database.delete(connection)
@@ -145,6 +241,8 @@ class ConnectionService:
 
 
         return True
+
+
 
 
 
