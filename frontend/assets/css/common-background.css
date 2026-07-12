@@ -1,0 +1,553 @@
+.common-bg {
+
+    position:fixed;
+
+    inset:0;
+
+    width:100%;
+
+    height:100%;
+
+    overflow:hidden;
+
+    z-index:-1;
+
+    pointer-events:none;
+
+    background:
+
+    radial-gradient(
+        circle at 70% 30%,
+        rgba(59,130,246,.18),
+        transparent 35%
+    ),
+
+    linear-gradient(
+        180deg,
+        #050b1a,
+        #081426
+    );
+
+}
+
+
+
+.common-grid {
+
+    position:absolute;
+
+    inset:-300px;
+
+    background-image:
+
+    linear-gradient(
+        rgba(96,165,250,.08) 1px,
+        transparent 1px
+    ),
+
+    linear-gradient(
+        90deg,
+        rgba(96,165,250,.08) 1px,
+        transparent 1px
+    );
+
+    background-size:
+
+    60px 60px;
+
+    transform:
+
+    perspective(900px)
+    rotateX(65deg);
+
+    animation:
+
+    gridFlow 18s linear infinite;
+
+    opacity:.35;
+
+}
+
+
+
+@keyframes gridFlow {
+
+    from {
+
+        transform:
+
+        perspective(900px)
+        rotateX(65deg)
+        translateY(0);
+
+    }
+
+    to {
+
+        transform:
+
+        perspective(900px)
+        rotateX(65deg)
+        translateY(60px);
+
+    }
+
+}
+
+
+
+
+
+.energy-glow {
+
+    position:absolute;
+
+    width:350px;
+
+    height:350px;
+
+    border-radius:50%;
+
+    filter:blur(100px);
+
+    opacity:.25;
+
+}
+
+
+
+.glow-one {
+
+    background:#2563eb;
+
+    top:15%;
+
+    left:15%;
+
+    animation:
+
+    glowMoveOne 10s infinite alternate;
+
+}
+
+
+
+.glow-two {
+
+    background:#06b6d4;
+
+    right:10%;
+
+    bottom:15%;
+
+    animation:
+
+    glowMoveTwo 12s infinite alternate;
+
+}
+
+
+
+@keyframes glowMoveOne {
+
+    from {
+
+        transform:translate3d(0,0,0);
+
+    }
+
+    to {
+
+        transform:translate3d(80px,60px,0);
+
+    }
+
+}
+
+
+
+@keyframes glowMoveTwo {
+
+    from {
+
+        transform:translate3d(0,0,0);
+
+    }
+
+    to {
+
+        transform:translate3d(-80px,-50px,0);
+
+    }
+
+}
+
+
+
+
+
+.network-node {
+
+    position:absolute;
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+    background:#60a5fa;
+
+    box-shadow:
+
+    0 0 25px #3b82f6;
+
+    animation:
+
+    nodePulse 3s infinite;
+
+}
+
+
+
+.node-one {
+
+    top:25%;
+
+    left:25%;
+
+}
+
+
+
+.node-two {
+
+    top:55%;
+
+    left:45%;
+
+    animation-delay:1s;
+
+}
+
+
+
+.node-three {
+
+    top:35%;
+
+    right:25%;
+
+    animation-delay:2s;
+
+}
+
+
+
+.node-four {
+
+    bottom:25%;
+
+    right:40%;
+
+    animation-delay:1.5s;
+
+}
+
+
+
+@keyframes nodePulse {
+
+    0%,100% {
+
+        transform:scale(1);
+
+        opacity:.5;
+
+    }
+
+    50% {
+
+        transform:scale(1.8);
+
+        opacity:1;
+
+    }
+
+}
+
+
+
+
+
+.connection-line {
+
+    position:absolute;
+
+    height:1px;
+
+    background:
+
+    linear-gradient(
+        90deg,
+        transparent,
+        rgba(96,165,250,.7),
+        transparent
+    );
+
+    animation:
+
+    lineMove 4s infinite;
+
+}
+
+
+
+.line-one {
+
+    width:300px;
+
+    top:28%;
+
+    left:27%;
+
+    transform:rotate(20deg);
+
+}
+
+
+
+.line-two {
+
+    width:260px;
+
+    top:45%;
+
+    left:45%;
+
+    transform:rotate(-25deg);
+
+}
+
+
+
+.line-three {
+
+    width:320px;
+
+    bottom:30%;
+
+    right:20%;
+
+    transform:rotate(15deg);
+
+}
+
+
+
+@keyframes lineMove {
+
+    0%,100% {
+
+        opacity:.2;
+
+    }
+
+    50% {
+
+        opacity:1;
+
+    }
+
+}
+
+
+
+
+
+.data-particle {
+
+    position:absolute;
+
+    width:6px;
+
+    height:6px;
+
+    border-radius:50%;
+
+    background:#22d3ee;
+
+    box-shadow:
+
+    0 0 15px #22d3ee;
+
+    animation:
+
+    particleTravel 6s infinite linear;
+
+}
+
+
+
+.particle-one {
+
+    top:28%;
+
+    left:25%;
+
+}
+
+
+
+.particle-two {
+
+    top:55%;
+
+    left:45%;
+
+    animation-delay:2s;
+
+}
+
+
+
+.particle-three {
+
+    top:35%;
+
+    right:25%;
+
+    animation-delay:4s;
+
+}
+
+
+
+@keyframes particleTravel {
+
+    from {
+
+        transform:translate3d(0,0,0);
+
+    }
+
+    to {
+
+        transform:translate3d(120px,-40px,0);
+
+    }
+
+}
+
+
+
+
+
+.radar-ring {
+
+    position:absolute;
+
+    width:300px;
+
+    height:300px;
+
+    border-radius:50%;
+
+    border:
+
+    1px solid rgba(96,165,250,.2);
+
+    right:15%;
+
+    top:25%;
+
+    animation:
+
+    radarPulse 6s infinite;
+
+}
+
+
+
+@keyframes radarPulse {
+
+    0% {
+
+        transform:scale(.6);
+
+        opacity:.1;
+
+    }
+
+    50% {
+
+        opacity:.5;
+
+    }
+
+    100% {
+
+        transform:scale(1.5);
+
+        opacity:0;
+
+    }
+
+}
+
+
+
+
+
+.scan-beam {
+
+    position:absolute;
+
+    width:100%;
+
+    height:120px;
+
+    left:0;
+
+    background:
+
+    linear-gradient(
+        transparent,
+        rgba(59,130,246,.15),
+        transparent
+    );
+
+    animation:
+
+    scanMove 8s infinite;
+
+}
+
+
+
+@keyframes scanMove {
+
+    0% {
+
+        top:-150px;
+
+    }
+
+    100% {
+
+        top:100%;
+
+    }
+
+}
+
+
+
+
+.page-content {
+
+    position:relative;
+
+    z-index:1;
+
+}

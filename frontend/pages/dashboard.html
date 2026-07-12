@@ -10,11 +10,13 @@
 AI Database Copilot Dashboard
 </title>
 
+
 <link rel="stylesheet" href="../assets/css/main.css">
 <link rel="stylesheet" href="../assets/css/layout.css">
 <link rel="stylesheet" href="../assets/css/components.css">
 <link rel="stylesheet" href="../assets/css/responsive.css">
 <link rel="stylesheet" href="../assets/css/effects.css">
+
 
 </head>
 
@@ -33,66 +35,15 @@ AI Database Copilot Dashboard
 
 
 
+
 <div class="app-container">
 
 
 
-<aside class="sidebar">
-
-
-<div class="logo">
-
-
-<div class="logo-icon">
-AI
+<div
+data-component="sidebar"
+data-replace="true">
 </div>
-
-
-<span>
-Database Copilot
-</span>
-
-
-</div>
-
-
-
-
-
-<nav class="menu">
-
-
-<a href="dashboard.html" class="menu-item active">
-🏠 Dashboard
-</a>
-
-
-<a href="connections.html" class="menu-item">
-🗄 Connections
-</a>
-
-
-<a href="query.html" class="menu-item">
-🧠 AI Query
-</a>
-
-
-<a href="history.html" class="menu-item">
-📜 History
-</a>
-
-
-<a href="profile.html" class="menu-item">
-👤 Profile
-</a>
-
-
-</nav>
-
-
-</aside>
-
-
 
 
 
@@ -102,30 +53,15 @@ Database Copilot
 
 
 
-<header class="navbar">
-
-
-<h3>
-Dashboard
-</h3>
-
-
-
-<div class="user-box">
-
-
-<div class="status-dot"></div>
-
-
-<div class="avatar">
-JD
+<div
+data-component="navbar"
+data-title="Dashboard"
+data-avatar="JD"
+data-replace="true">
 </div>
 
 
-</div>
 
-
-</header>
 
 
 
@@ -182,102 +118,43 @@ All Systems Operational
 
 
 
+
 <section class="dashboard-grid">
 
 
-
-<div class="ui-card premium-hover">
-
-
-<div class="ui-card-title">
-Database Connections
-</div>
-
-
-<div class="ui-card-value">
-12
-</div>
-
-
-<p>
-Active databases
-</p>
-
-
+<div 
+data-component="card"
+data-title="Database Connections"
+data-value="12"
+data-description="Active databases">
 </div>
 
 
 
-
-
-<div class="ui-card premium-hover">
-
-
-<div class="ui-card-title">
-AI Queries Today
-</div>
-
-
-<div class="ui-card-value">
-245
-</div>
-
-
-<p>
-Generated SQL requests
-</p>
-
-
+<div 
+data-component="card"
+data-title="AI Queries Today"
+data-value="245"
+data-description="Generated SQL requests">
 </div>
 
 
 
-
-
-<div class="ui-card premium-hover">
-
-
-<div class="ui-card-title">
-Success Rate
-</div>
-
-
-<div class="ui-card-value">
-98%
-</div>
-
-
-<p>
-Execution accuracy
-</p>
-
-
+<div 
+data-component="card"
+data-title="Success Rate"
+data-value="98%"
+data-description="Execution accuracy">
 </div>
 
 
 
-
-
-<div class="ui-card premium-hover">
-
-
-<div class="ui-card-title">
-Average Response
+<div 
+data-component="card"
+data-title="Average Response"
+data-value="1.2s"
+data-description="Query execution speed">
 </div>
-
-
-<div class="ui-card-value">
-1.2s
-</div>
-
-
-<p>
-Query execution speed
-</p>
-
-
-</div>
-
 
 
 </section>
@@ -318,13 +195,12 @@ Connect enterprise database
 </p>
 
 
-<button
-class="ui-btn ui-btn-primary"
-onclick="window.location.href='connections.html'">
-
-Open
-
-</button>
+<div
+data-component="button"
+data-type="ui-btn-primary"
+data-text="Open"
+data-href="connections.html">
+</div>
 
 
 </div>
@@ -348,13 +224,12 @@ Generate SQL using AI
 </p>
 
 
-<button
-class="ui-btn ui-btn-primary"
-onclick="window.location.href='query.html'">
-
-Open
-
-</button>
+<div
+data-component="button"
+data-type="ui-btn-primary"
+data-text="Open"
+data-href="query.html">
+</div>
 
 
 </div>
@@ -378,13 +253,12 @@ Review previous operations
 </p>
 
 
-<button
-class="ui-btn ui-btn-primary"
-onclick="window.location.href='history.html'">
-
-Open
-
-</button>
+<div
+data-component="button"
+data-type="ui-btn-primary"
+data-text="Open"
+data-href="history.html">
+</div>
 
 
 </div>
@@ -637,6 +511,8 @@ Success
 
 
 
+
+
 <button
 class="ui-btn ui-btn-success"
 onclick="showToast('Dashboard Loaded','success')">
@@ -658,9 +534,6 @@ Test Notification
 
 </div>
 
-
-
-</div>
 
 
 
