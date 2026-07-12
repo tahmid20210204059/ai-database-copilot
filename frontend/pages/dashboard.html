@@ -1,36 +1,41 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 
 <head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>
 AI Database Copilot Dashboard
 </title>
 
-
 <link rel="stylesheet" href="../assets/css/main.css">
-
 <link rel="stylesheet" href="../assets/css/layout.css">
-
 <link rel="stylesheet" href="../assets/css/components.css">
-
 <link rel="stylesheet" href="../assets/css/responsive.css">
-
+<link rel="stylesheet" href="../assets/css/effects.css">
 
 </head>
-
 
 
 <body>
 
 
+<div class="ai-background">
+
+<canvas id="aiGlobe"></canvas>
+
+<div class="ai-grid"></div>
+
+</div>
+
+
+
+
 <div class="app-container">
 
 
-<!-- Sidebar -->
 
 <aside class="sidebar">
 
@@ -51,30 +56,33 @@ Database Copilot
 </div>
 
 
+
+
+
 <nav class="menu">
 
 
-<a class="menu-item active">
+<a href="dashboard.html" class="menu-item active">
 🏠 Dashboard
 </a>
 
 
-<a class="menu-item">
+<a href="connections.html" class="menu-item">
 🗄 Connections
 </a>
 
 
-<a class="menu-item">
+<a href="query.html" class="menu-item">
 🧠 AI Query
 </a>
 
 
-<a class="menu-item">
+<a href="history.html" class="menu-item">
 📜 History
 </a>
 
 
-<a class="menu-item">
+<a href="profile.html" class="menu-item">
 👤 Profile
 </a>
 
@@ -87,7 +95,7 @@ Database Copilot
 
 
 
-<!-- Main -->
+
 
 
 <div class="main-area">
@@ -102,12 +110,23 @@ Dashboard
 </h3>
 
 
+
+<div class="user-box">
+
+
+<div class="status-dot"></div>
+
+
 <div class="avatar">
 JD
 </div>
 
 
+</div>
+
+
 </header>
+
 
 
 
@@ -119,51 +138,193 @@ JD
 <main class="page-content">
 
 
+
+
+
+<section class="hero">
+
+
 <h1>
-Welcome back 👋
+Welcome back, Tushin 👋
 </h1>
 
 
 <p>
-Your AI database workspace
+Your AI database workspace is ready.
 </p>
 
 
 
+<div style="margin-top:20px;">
 
 
-<div class="section">
+<span class="badge badge-success">
+
+
+<span class="status-dot"></span>
+
+
+All Systems Operational
+
+
+</span>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="dashboard-grid">
+
+
+
+<div class="ui-card premium-hover">
+
+
+<div class="ui-card-title">
+Database Connections
+</div>
+
+
+<div class="ui-card-value">
+12
+</div>
+
+
+<p>
+Active databases
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="ui-card premium-hover">
+
+
+<div class="ui-card-title">
+AI Queries Today
+</div>
+
+
+<div class="ui-card-value">
+245
+</div>
+
+
+<p>
+Generated SQL requests
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="ui-card premium-hover">
+
+
+<div class="ui-card-title">
+Success Rate
+</div>
+
+
+<div class="ui-card-value">
+98%
+</div>
+
+
+<p>
+Execution accuracy
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="ui-card premium-hover">
+
+
+<div class="ui-card-title">
+Average Response
+</div>
+
+
+<div class="ui-card-value">
+1.2s
+</div>
+
+
+<p>
+Query execution speed
+</p>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section">
+
+
+<h2>
+Quick Actions
+</h2>
+
 
 
 <div class="dashboard-grid">
 
 
-<div class="card">
-
-<div class="card-title">
-Connections
-</div>
-
-
-<div class="card-value">
-12
-</div>
-
-
-</div>
 
 
 
-<div class="card">
-
-<div class="card-title">
-Queries Today
-</div>
+<div class="ui-card premium-hover">
 
 
-<div class="card-value">
-245
-</div>
+<h3>
+➕ Add Database
+</h3>
+
+
+<p>
+Connect enterprise database
+</p>
+
+
+<button
+class="ui-btn ui-btn-primary"
+onclick="window.location.href='connections.html'">
+
+Open
+
+</button>
 
 
 </div>
@@ -171,16 +332,59 @@ Queries Today
 
 
 
-<div class="card">
 
-<div class="card-title">
-Success Rate
+
+
+<div class="ui-card premium-hover">
+
+
+<h3>
+🧠 New AI Query
+</h3>
+
+
+<p>
+Generate SQL using AI
+</p>
+
+
+<button
+class="ui-btn ui-btn-primary"
+onclick="window.location.href='query.html'">
+
+Open
+
+</button>
+
+
 </div>
 
 
-<div class="card-value">
-98%
-</div>
+
+
+
+
+
+<div class="ui-card premium-hover">
+
+
+<h3>
+📜 Query History
+</h3>
+
+
+<p>
+Review previous operations
+</p>
+
+
+<button
+class="ui-btn ui-btn-primary"
+onclick="window.location.href='history.html'">
+
+Open
+
+</button>
 
 
 </div>
@@ -190,7 +394,259 @@ Success Rate
 </div>
 
 
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section">
+
+
+<h2>
+AI Processing Pipeline
+</h2>
+
+
+
+<div class="ui-card pipeline">
+
+
+<span>
+User Request
+</span>
+
+
+<span>
+→
+</span>
+
+
+<span>
+AI Understanding
+</span>
+
+
+<span>
+→
+</span>
+
+
+<span>
+SQL Generation
+</span>
+
+
+<span>
+→
+</span>
+
+
+<span>
+Validation
+</span>
+
+
+<span>
+→
+</span>
+
+
+<span>
+Execution
+</span>
+
+
+<span>
+→
+</span>
+
+
+<span>
+Result
+</span>
+
+
 </div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section">
+
+
+<h2>
+System Status
+</h2>
+
+
+
+<div class="ui-card">
+
+
+<p>
+🟢 Database Service Online
+</p>
+
+
+<p>
+🟢 Gemini AI Service Online
+</p>
+
+
+<p>
+🟢 API Server Healthy
+</p>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="section">
+
+
+<h2>
+Recent Activity
+</h2>
+
+
+
+<div class="ui-card table-wrapper">
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+<th>
+Query
+</th>
+
+<th>
+Status
+</th>
+
+<th>
+Time
+</th>
+
+</tr>
+
+
+</thead>
+
+
+
+
+<tbody>
+
+
+<tr>
+
+
+<td>
+Show top customers
+</td>
+
+
+<td>
+
+<span class="badge badge-success">
+Success
+</span>
+
+</td>
+
+
+<td>
+1.2s
+</td>
+
+
+</tr>
+
+
+
+
+
+<tr>
+
+
+<td>
+Revenue analysis
+</td>
+
+
+<td>
+
+<span class="badge badge-success">
+Success
+</span>
+
+</td>
+
+
+<td>
+2.1s
+</td>
+
+
+</tr>
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+<button
+class="ui-btn ui-btn-success"
+onclick="showToast('Dashboard Loaded','success')">
+
+Test Notification
+
+</button>
+
+
+
 
 
 
@@ -200,13 +656,19 @@ Success Rate
 </div>
 
 
-
 </div>
 
 
 
 </div>
 
+
+
+
+
+<script src="../assets/js/components.js"></script>
+
+<script src="../assets/js/globe.js"></script>
 
 
 </body>

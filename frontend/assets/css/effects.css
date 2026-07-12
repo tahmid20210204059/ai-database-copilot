@@ -1,0 +1,450 @@
+/*
+=====================================
+AI DATABASE COPILOT
+HOLOGRAPHIC AI BACKGROUND
+====================================
+*/
+
+
+
+
+.ai-core::after {
+
+
+    content:"";
+
+
+    position:absolute;
+
+
+    inset:70px;
+
+
+    border-radius:50%;
+
+
+    background:
+
+    radial-gradient(
+
+    circle,
+
+    rgba(59,130,246,.9),
+
+    transparent 65%
+
+    );
+
+
+    animation:
+
+    pulseCore 3s infinite;
+
+}
+
+
+
+
+
+@keyframes rotateCore {
+
+
+    from {
+
+        transform:
+        rotate(0deg);
+
+    }
+
+
+    to {
+
+        transform:
+        rotate(360deg);
+
+    }
+
+}
+
+
+
+
+
+@keyframes pulseCore {
+
+
+    0%,100% {
+
+        transform:
+        scale(.8);
+
+        opacity:.4;
+
+    }
+
+
+    50% {
+
+        transform:
+        scale(1.2);
+
+        opacity:.9;
+
+    }
+
+}
+
+
+
+
+
+
+
+/*
+NETWORK NODES
+*/
+
+
+.ai-node {
+
+
+    position:absolute;
+
+
+    width:14px;
+
+
+    height:14px;
+
+
+    border-radius:50%;
+
+
+    background:#60A5FA;
+
+
+    box-shadow:
+
+    0 0 24px rgba(96,165,250,0.95),
+    0 0 42px rgba(59,130,246,0.32);
+
+
+    opacity:0.96;
+
+
+}
+
+
+
+
+
+.node-one {
+
+
+    top:24%;
+
+
+    left:20%;
+
+
+    animation:
+
+    moveNode1 8s infinite alternate ease-in-out;
+
+}
+
+
+
+
+.node-two {
+
+
+    top:68%;
+
+
+    left:44%;
+
+
+    animation:
+
+    moveNode2 10s infinite alternate ease-in-out;
+
+}
+
+
+
+
+.node-three {
+
+
+    top:38%;
+
+
+    right:30%;
+
+
+    animation:
+
+    moveNode3 7s infinite alternate ease-in-out;
+
+
+}
+
+
+
+
+.node-four {
+
+
+    top:55%;
+
+
+    right:18%;
+
+
+    animation:
+
+    moveNode4 9s infinite alternate ease-in-out;
+
+}
+
+
+
+
+
+@keyframes moveNode1 {
+
+
+    to {
+
+        transform:
+        translate(220px,110px) scale(1.08);
+
+    }
+
+}
+
+
+
+
+
+@keyframes moveNode2 {
+
+
+    to {
+
+        transform:
+        translate(-180px,-130px) scale(1.05);
+
+    }
+
+}
+
+
+
+
+
+@keyframes moveNode3 {
+
+
+    to {
+
+        transform:
+        translate(-220px,140px) scale(1.08);
+
+    }
+
+}
+
+
+
+@keyframes moveNode4 {
+
+
+    to {
+
+        transform:
+        translate(-140px,-80px) scale(1.15);
+
+    }
+
+}
+
+
+
+
+
+
+
+/*
+DATA PACKET
+*/
+
+
+.packet {
+
+
+    position:absolute;
+
+
+    width:12px;
+
+
+    height:12px;
+
+
+    border-radius:50%;
+
+
+    background:#22C55E;
+
+
+    box-shadow:
+
+    0 0 20px #22C55E;
+
+
+    animation:
+
+    packetMove 5s linear infinite;
+
+}
+
+
+
+@keyframes packetMove {
+
+
+    from {
+
+
+        transform:
+
+        translateX(-100px);
+
+
+    }
+
+
+    to {
+
+
+        transform:
+
+        translateX(900px);
+
+
+    }
+
+}
+
+
+
+
+
+
+/*
+CONNECTION LINE
+*/
+
+
+.ai-line {
+
+
+    position:absolute;
+
+
+    height:1px;
+
+
+    background:
+
+    linear-gradient(
+
+    90deg,
+
+    transparent,
+
+    #3B82F6,
+
+    transparent
+
+    );
+
+
+    animation:
+
+    linePulse 3s infinite;
+
+}
+
+
+
+@keyframes linePulse {
+
+
+    0%,100% {
+
+        opacity:.2;
+
+    }
+
+
+    50% {
+
+        opacity:1;
+
+    }
+
+}
+
+
+
+#aiGlobe {
+
+    position:absolute;
+
+    right:8%;
+
+    top:50%;
+
+    transform: translateY(-50%);
+
+    /* responsive: keep desktop 500px, scale down on narrow viewports */
+    width: min(500px, 78vw);
+    aspect-ratio: 1 / 1;
+
+    opacity:0.98;
+
+    filter: drop-shadow(0 0 85px rgba(59,130,246,0.24));
+
+}
+
+
+
+/* media queries no longer enforce a fixed large size; width uses min(500px,78vw) */
+
+
+.ai-background {
+
+
+    position:fixed;
+
+
+    inset:0;
+
+
+    overflow:hidden;
+
+
+    z-index:-1;
+
+    background:
+    linear-gradient(
+        180deg,
+        #071426 0%,
+        #02050e 100%
+    );
+
+}
+

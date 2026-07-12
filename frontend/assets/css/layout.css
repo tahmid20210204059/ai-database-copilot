@@ -1,67 +1,85 @@
 /*
-====================================
-AI DATABASE COPILOT
-APPLICATION LAYOUT
-====================================
+=====================================
+PREMIUM APPLICATION LAYOUT
+=====================================
 */
 
 
 .app-container {
 
+
     display:flex;
+
 
     min-height:100vh;
 
+
 }
 
-
-
-/*
-SIDEBAR SPACE
-*/
 
 
 .main-area {
 
 
-    margin-left:260px;
+    margin-left:270px;
 
 
-    width:calc(100% - 260px);
+    width:
+    calc(100% - 270px);
 
-
-    min-height:100vh;
-
-
-    transition:var(--transition);
 
 }
 
+
+
+.content-wrapper {
+
+
+    padding-top:90px;
+
+
+}
 
 
 
 .page-content {
 
 
-    padding:32px;
+    padding:
+
+    35px 40px;
+
 
     animation:
-    fadeIn 0.4s ease;
+    pageIn .25s ease;
 
 }
 
 
 
 
-/*
-NAVBAR SPACE
-*/
+.dashboard-grid {
 
 
-.content-wrapper {
+    display:grid;
 
 
-    padding-top:80px;
+    grid-template-columns:
+    repeat(4,1fr);
+
+
+    gap:24px;
+
+
+}
+
+
+
+
+.section {
+
+
+    margin-top:35px;
 
 }
 
@@ -69,26 +87,31 @@ NAVBAR SPACE
 
 
 
-@keyframes fadeIn {
+.hero {
 
 
-    from {
+    margin-bottom:35px;
 
-        opacity:0;
-
-        transform:
-        translateY(10px);
-
-    }
+}
 
 
-    to {
 
-        opacity:1;
 
-        transform:
-        translateY(0);
+.hero h1 {
 
-    }
+
+    font-size:
+    36px;
+
+
+}
+
+
+
+.hero p {
+
+
+    margin-top:
+    8px;
 
 }
