@@ -1,165 +1,235 @@
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+/*
+AI DATABASE COPILOT
+AUTHENTICATION MANAGEMENT
+*/
+
+(function(){
+
+    function setButtonState(
+        button,
+        disabled,
+        label
+    ){
+
+        if(!button){
+            return;
+        }
+
+        button.disabled =
+        disabled;
+
+        button.innerText =
+        label;
+
+    }
 
 
-        const loginForm =
+
+
+
+    async function handleLoginSubmit(
+        event
+    ){
+
+        event.preventDefault();
+
+
+
+        const emailInput =
         document.getElementById(
-            "loginForm"
+            "email"
         );
 
 
-        if(!loginForm)
-        return;
+        const passwordInput =
+        document.getElementById(
+            "password"
+        );
+
+
+        const loginButton =
+        document.getElementById(
+            "loginButton"
+        );
 
 
 
-        loginForm.addEventListener(
-            "submit",
-            async(e)=>{
-
-
-                e.preventDefault();
-
-
-
-                const email =
-                document.getElementById(
-                    "email"
-                ).value;
+        const email =
+        emailInput
+        ?
+        emailInput.value.trim()
+        :
+        "";
 
 
 
-                const password =
-                document.getElementById(
-                    "password"
-                ).value;
+        const password =
+        passwordInput
+        ?
+        passwordInput.value
+        :
+        "";
 
 
 
-                const button =
-                document.getElementById(
-                    "loginButton"
+        const selectedRoleInput =
+        document.getElementById(
+            "selectedRole"
+        );
+
+
+
+        const selectedRole =
+        selectedRoleInput
+        ?
+        selectedRoleInput.value
+        :
+        "user";
+
+
+
+
+
+        setButtonState(
+            loginButton,
+            true,
+            "Logging in..."
+        );
+
+
+
+
+
+        try{
+
+
+            const data =
+            await window.apiPost(
+                "/api/login",
+                {
+
+                    email: email,
+
+                    password: password,
+
+                },
+                {
+
+                    auth:false,
+
+                }
+            );
+
+
+
+
+
+            if(
+                data.user &&
+                data.user.role !== selectedRole
+            ){
+
+                throw new Error(
+                    `Please select ${data.user.role} workspace for this account`
                 );
 
-
-
-                button.disabled = true;
-
-                button.innerText =
-                "Logging in...";
-
-
-
-                try{
-
-
-                    const response =
-                    await fetch(
-                        "http://127.0.0.1:8000/api/login",
-                        {
-
-                        method:"POST",
-
-                        headers:{
-
-                            "Content-Type":
-                            "application/json"
-
-                        },
-
-
-                        body:JSON.stringify({
-
-                            email:email,
-
-                            password:password
-
-                        })
-
-                        }
-                    );
-
-
-
-                    const data =
-                    await response.json();
+            }
 
 
 
 
-                    if(!response.ok){
 
-                        throw new Error(
-                            data.detail ||
-                            "Login failed"
-                        );
+
+            window.setUserSession(
+                data.access_token,
+                data.user
+            );
+
+
+
+
+
+            if(
+                typeof showToast === "function"
+            ){
+
+                showToast(
+                    "Login successful",
+                    "success"
+                );
+
+            }
+
+
+
+
+
+
+            setTimeout(
+                function(){
+
+
+                    if(
+                        data.user &&
+                        data.user.role === "owner"
+                    ){
+
+                        window.location.href =
+                        "admin-dashboard.html";
+
+                        return;
 
                     }
 
 
 
-
-                    localStorage.setItem(
-                        "access_token",
-                        data.access_token
-                    );
+                    window.location.href =
+                    "dashboard.html";
 
 
 
-                    showToast(
-                        "Login successful",
-                        "success"
-                    );
+                },
+                1000
+            );
 
 
 
-                    setTimeout(()=>{
-
-                        window.location.href =
-                        "dashboard.html";
-
-                    },1000);
+        }
 
 
-
-                }
-
-
-                catch(error){
+        catch(error){
 
 
-                    showToast(
-                        error.message,
-                        "error"
-                    );
+            if(
+                typeof showToast === "function"
+            ){
 
-
-                }
-
-
-                finally{
-
-
-                    button.disabled=false;
-
-
-                    button.innerText =
-                    "Login";
-
-
-                }
-
-
+                showToast(
+                    error.message,
+                    "error"
+                );
 
             }
 
-        );
 
+        }
+
+
+
+        finally{
+
+
+            setButtonState(
+                loginButton,
+                false,
+                "Login"
+            );
+
+
+        }
 
     }
 
-);
 
 
 
@@ -167,197 +237,118 @@ document.addEventListener(
 
 
 
-function logout(){
+    async function loadUserProfile(){
+
+        const user =
+        await window.getCurrentUser();
 
 
-    localStorage.removeItem(
-        "access_token"
-    );
 
+        if(!user){
 
-    window.location.href =
-    "login.html";
+            return;
 
-
-}
-
-
+        }
 
 
 
 
+        const welcomeName =
+        document.getElementById(
+            "welcomeName"
+        );
 
 
-async function getCurrentUser(){
+        const avatar =
+        document.querySelector(
+            ".avatar"
+        );
 
 
-    const token =
-    localStorage.getItem(
-        "access_token"
-    );
-
-
-
-    if(!token)
-    return null;
-
-
-
-    try{
-
-
-        const response =
-        await fetch(
-            "http://127.0.0.1:8000/api/profile",
-            {
-
-            method:"GET",
-
-            headers:{
-
-                "Authorization":
-                `Bearer ${token}`
-
-            }
-
-            }
+        const username =
+        document.querySelector(
+            ".user-name"
         );
 
 
 
-        if(!response.ok){
 
-            throw new Error(
-                "Failed to load profile"
+
+        if(welcomeName){
+
+            welcomeName.innerText =
+            user.name || "User";
+
+        }
+
+
+
+
+
+        if(avatar){
+
+            avatar.innerText =
+            window.getInitials(
+                user.name
             );
 
         }
 
 
 
-        const user =
-        await response.json();
 
 
+        if(username){
 
-        return user;
+            username.innerText =
+            user.name || "User";
 
-
-
-    }
-
-
-    catch(error){
-
-
-        console.error(
-            "Profile error:",
-            error
-        );
-
-
-        return null;
+        }
 
 
     }
 
 
-}
 
 
 
 
 
 
+    document.addEventListener(
+        "DOMContentLoaded",
+        function(){
+
+
+            const loginForm =
+            document.getElementById(
+                "loginForm"
+            );
 
 
 
-async function loadUserProfile(){
+            if(loginForm){
 
+                loginForm.addEventListener(
+                    "submit",
+                    handleLoginSubmit
+                );
 
-    const user =
-    await getCurrentUser();
-
-
-
-    if(!user)
-    return;
-
+            }
 
 
 
-    const welcomeName =
-    document.getElementById(
-        "welcomeName"
+            loadUserProfile();
+
+
+        }
     );
 
 
 
-    if(welcomeName){
+
+    window.loadUserProfile =
+    loadUserProfile;
 
 
-        welcomeName.innerText =
-        user.name;
-
-
-    }
-
-
-
-
-
-    const avatar =
-    document.querySelector(
-        ".avatar"
-    );
-
-
-
-    if(avatar){
-
-
-        avatar.innerText =
-        user.name
-        .substring(0,2)
-        .toUpperCase();
-
-
-    }
-
-
-
-
-
-    const username =
-    document.querySelector(
-        ".user-name"
-    );
-
-
-
-    if(username){
-
-
-        username.innerText =
-        user.name;
-
-
-    }
-
-
-
-}
-
-
-
-
-
-
-document.addEventListener(
-    "DOMContentLoaded",
-    ()=>{
-
-        loadUserProfile();
-
-    }
-);
+})();

@@ -3,39 +3,14 @@ AI DATABASE COPILOT
 AUTH GUARD SYSTEM
 */
 
-
 (function(){
+    const currentPage = window.location.pathname.split("/").pop();
 
+    if(currentPage === "login.html"){
+        return;
+    }
 
-const token =
-localStorage.getItem(
-    "access_token"
-);
-
-
-
-const currentPage =
-window.location.pathname;
-
-
-
-const isLoginPage =
-currentPage.includes(
-    "login.html"
-);
-
-
-
-if(
-    !token &&
-    !isLoginPage
-){
-
-    window.location.href =
-    "login.html";
-
-}
-
-
-
+    if(!window.getToken || !window.getToken()){
+        window.location.href = "login.html";
+    }
 })();

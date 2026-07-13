@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Databases</title>
+<link rel="stylesheet" href="../assets/css/main.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/effects.css">
+<link rel="stylesheet" href="../assets/css/common-background.css">
+<style>
+    .admin-shell {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .admin-shell.is-ready {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+</style>
+</head>
+
+<body data-role="owner">
+<div id="common-background"></div>
+
+<div class="app-container admin-shell is-loading" id="adminShell">
+    <aside class="sidebar" id="adminSidebar" aria-label="Admin navigation">
+        <div class="logo">
+            <div class="logo-icon">AI</div>
+            <span>Database Copilot</span>
+        </div>
+
+        <nav class="menu">
+            <a href="admin-dashboard.html" class="menu-item" data-page="admin-dashboard.html">Admin Dashboard</a>
+            <a href="admin-users.html" class="menu-item" data-page="admin-users.html">Users</a>
+            <a href="admin-connections.html" class="menu-item active" data-page="admin-connections.html">Databases</a>
+            <a href="admin-analytics.html" class="menu-item" data-page="admin-analytics.html">Analytics</a>
+            <a href="#logout" class="menu-item" data-action="logout">Logout</a>
+        </nav>
+    </aside>
+
+    <div class="main-area">
+        <header class="navbar" id="adminNavbar">
+            <div class="navbar-left">
+                <h3 id="pageTitle">Admin Databases</h3>
+            </div>
+
+            <div class="user-box">
+                <div class="user-info">
+                    <div class="user-name" id="adminName">Admin</div>
+                    <div class="user-role" id="adminRole">Owner</div>
+                </div>
+
+                <div class="avatar" id="adminAvatar">AD</div>
+
+                <button class="ui-btn ui-btn-danger logout-btn" id="adminLogoutBtn" type="button">
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="page-content">
+                <section class="hero">
+                    <h1>Database Monitoring</h1>
+                    <p>Monitor customer database connections across the platform.</p>
+                </section>
+
+                <section class="dashboard-grid">
+                    <div class="ui-card premium-hover">
+                        <div class="ui-card-title">Total Connected Databases</div>
+                        <div class="ui-card-value" id="totalConnections">Loading...</div>
+                        <p>All monitored connections</p>
+                    </div>
+
+                    <div class="ui-card premium-hover">
+                        <div class="ui-card-title">Active Connections</div>
+                        <div class="ui-card-value" id="activeConnections">Loading...</div>
+                        <p>Connections currently marked active</p>
+                    </div>
+
+                    <div class="ui-card premium-hover">
+                        <div class="ui-card-title">Inactive Connections</div>
+                        <div class="ui-card-value" id="inactiveConnections">Loading...</div>
+                        <p>Connections requiring attention</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Connection Inventory</h2>
+
+                    <div class="ui-card table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Connection Name</th>
+                                    <th>Database</th>
+                                    <th>Host</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="connectionsTableBody">
+                                <tr>
+                                    <td colspan="5">Loading databases...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Security Notes</h2>
+
+                    <div class="ui-card">
+                        <p>Password fields are never exposed in the admin view.</p>
+                        <p>The current admin connections API does not expose stored secrets.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/navigation.js"></script>
+<script src="../assets/js/owner-guard.js"></script>
+<script src="../assets/js/admin-connections.js"></script>
+<script src="../assets/js/common-background.js"></script>
+</body>
+</html>

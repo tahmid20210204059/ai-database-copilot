@@ -14,13 +14,295 @@ AI Database Copilot Login
 
 
 <link rel="stylesheet" href="../assets/css/main.css">
-
 <link rel="stylesheet" href="../assets/css/components.css">
-
 <link rel="stylesheet" href="../assets/css/common-background.css">
 
 
+
+<style>
+
+.login-page {
+
+    min-height:100vh;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:24px;
+
+}
+
+
+
+.login-card {
+
+    width:100%;
+
+    max-width:460px;
+
+    padding:42px;
+
+    backdrop-filter:blur(20px);
+
+}
+
+
+
+.login-logo {
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:14px;
+
+    margin-bottom:30px;
+
+}
+
+
+
+.login-logo span {
+
+    font-size:24px;
+
+    font-weight:700;
+
+}
+
+
+
+.login-card h1 {
+
+    text-align:center;
+
+    margin-bottom:8px;
+
+}
+
+
+
+.subtitle {
+
+    text-align:center;
+
+    opacity:.75;
+
+    margin-bottom:30px;
+
+}
+
+
+
+.role-selector {
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:14px;
+
+    margin-bottom:28px;
+
+}
+
+
+
+.role-option {
+
+    padding:18px;
+
+    border-radius:16px;
+
+    border:1px solid rgba(255,255,255,.15);
+
+    cursor:pointer;
+
+    text-align:center;
+
+    transition:.25s;
+
+}
+
+
+
+.role-option:hover {
+
+    transform:translateY(-2px);
+
+}
+
+
+
+.role-option.active {
+
+    border-color:#4f46e5;
+
+    background:rgba(79,70,229,.15);
+
+}
+
+
+
+.role-title {
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+
+
+
+.role-description {
+
+    margin-top:5px;
+
+    font-size:13px;
+
+    opacity:.7;
+
+}
+
+
+
+.form-group {
+
+    margin-bottom:20px;
+
+}
+
+
+
+.form-group label {
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+
+
+.input-wrapper {
+
+    position:relative;
+
+}
+
+
+
+.input {
+
+    width:100%;
+
+}
+
+
+
+.password-toggle {
+
+    position:absolute;
+
+    right:14px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    cursor:pointer;
+
+    opacity:.7;
+
+}
+
+
+
+.password-toggle:hover {
+
+    opacity:1;
+
+}
+
+.password-toggle svg {
+
+    display:block;
+
+    width:20px;
+
+    height:20px;
+
+}
+
+
+.password-toggle {
+
+    color:#000;
+
+}
+
+
+
+.input.error {
+
+    border:1px solid #ef4444 !important;
+
+}
+
+
+
+.error-message {
+
+    color:#ef4444;
+
+    font-size:13px;
+
+    margin-top:6px;
+
+}
+
+
+
+.login-button {
+
+    width:100%;
+
+    margin-top:10px;
+
+}
+
+
+
+#loginMessage {
+
+    margin-top:18px;
+
+    text-align:center;
+
+}
+
+
+
+.success-message {
+
+    color:#22c55e;
+
+}
+
+
+
+</style>
+
+
 </head>
+
 
 
 <body>
@@ -30,11 +312,15 @@ AI Database Copilot Login
 
 
 
-<div class="login-container">
+
+
+<div class="login-page">
 
 
 
 <div class="login-card ui-card">
+
+
 
 
 
@@ -49,9 +335,7 @@ AI
 
 
 <span>
-
 Database Copilot
-
 </span>
 
 
@@ -66,9 +350,63 @@ Welcome Back
 </h1>
 
 
-<p>
-Login to your AI database workspace
+<p class="subtitle">
+Choose your workspace and login securely
 </p>
+
+
+
+
+
+
+
+<div class="role-selector">
+
+
+<div 
+class="role-option active"
+data-role="user">
+
+
+<div class="role-title">
+User
+</div>
+
+
+<div class="role-description">
+Customer Workspace
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div 
+class="role-option"
+data-role="owner">
+
+
+<div class="role-title">
+Owner
+</div>
+
+
+<div class="role-description">
+Admin Control Panel
+</div>
+
+
+</div>
+
+
+</div>
+
+
 
 
 
@@ -76,6 +414,21 @@ Login to your AI database workspace
 
 <form id="loginForm">
 
+
+
+<input
+type="hidden"
+id="selectedRole"
+value="user"
+>
+
+
+
+
+
+
+
+<div class="form-group">
 
 
 <label>
@@ -92,10 +445,29 @@ required
 >
 
 
+<div 
+id="emailError"
+class="error-message">
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="form-group">
+
 
 <label>
 Password
 </label>
+
+
+<div class="input-wrapper">
 
 
 <input
@@ -107,10 +479,54 @@ required
 >
 
 
+<span 
+class="password-toggle"
+id="togglePassword">
+
+    <svg 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24"
+    fill="none">
+
+        <path
+        d="M12 5C7 5 2.73 8.11 1 12C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 12C21.27 8.11 17 5 12 5Z"
+        stroke="#000"
+        stroke-width="2"/>
+
+        <circle
+        cx="12"
+        cy="12"
+        r="3"
+        stroke="#000"
+        stroke-width="2"/>
+
+    </svg>
+
+</span>
+
+
+</div>
+
+
+
+<div 
+id="passwordError"
+class="error-message">
+</div>
+
+
+</div>
+
+
+
+
+
+
 
 <button
 type="submit"
-class="ui-btn ui-btn-primary"
+class="ui-btn ui-btn-primary login-button"
 id="loginButton">
 
 Login
@@ -125,27 +541,504 @@ Login
 
 
 
+
+
 <div id="loginMessage"></div>
 
 
 
+
+
 </div>
 
 
-
 </div>
+
+
 
 
 
 
 
 <script src="../assets/js/common-background.js"></script>
-
 <script src="../assets/js/components.js"></script>
-
+<script src="../assets/js/api.js"></script>
 <script src="../assets/js/auth.js"></script>
+
+
+
+
+<script>
+
+
+let selectedRole =
+"user";
+
+
+
+document
+.querySelectorAll(".role-option")
+.forEach(option=>{
+
+
+    option.addEventListener(
+        "click",
+        ()=>{
+
+
+            document
+            .querySelectorAll(".role-option")
+            .forEach(item=>{
+
+                item.classList.remove(
+                    "active"
+                );
+
+            });
+
+
+
+            option.classList.add(
+                "active"
+            );
+
+
+            selectedRole =
+            option.dataset.role;
+
+
+
+            document
+            .getElementById(
+                "selectedRole"
+            )
+            .value =
+            selectedRole;
+
+
+        }
+    );
+
+
+});
+
+
+
+
+
+
+
+
+
+const passwordInput =
+document.getElementById(
+    "password"
+);
+
+
+
+const togglePassword =
+document.getElementById(
+    "togglePassword"
+);
+
+
+
+togglePassword.addEventListener(
+"click",
+()=>{
+
+
+    if(
+        passwordInput.type === "password"
+    ){
+
+        passwordInput.type =
+        "text";
+
+        togglePassword.innerHTML =
+        `
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+
+<path
+ d="M12 5C7 5 2.73 8.11 1 12C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 12C21.27 8.11 17 5 12 5Z"
+stroke="#000"
+stroke-width="2"/>
+
+<circle
+cx="12"
+cy="12"
+r="3"
+stroke="#000"
+stroke-width="2"/>
+
+</svg>
+`;
+
+    }
+
+    else{
+
+        passwordInput.type =
+        "password";
+
+        togglePassword.innerHTML =
+        `
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+
+<path
+ d="M12 5C7 5 2.73 8.11 1 12C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 12C21.27 8.11 17 5 12 5Z"
+stroke="#000"
+stroke-width="2"/>
+
+<circle
+cx="12"
+cy="12"
+r="3"
+stroke="#000"
+stroke-width="2"/>
+
+</svg>
+`;
+
+    }
+
+
+});
+
+
+
+
+function clearErrors(){
+
+
+    document
+    .getElementById(
+        "email"
+    )
+    .classList.remove(
+        "error"
+    );
+
+
+    document
+    .getElementById(
+        "password"
+    )
+    .classList.remove(
+        "error"
+    );
+
+
+    document
+    .getElementById(
+        "emailError"
+    )
+    .innerText =
+    "";
+
+
+    document
+    .getElementById(
+        "passwordError"
+    )
+    .innerText =
+    "";
+
+
+}
+
+
+
+
+
+
+
+document
+.getElementById(
+    "loginForm"
+)
+.addEventListener(
+"submit",
+async(e)=>{
+
+
+    e.preventDefault();
+
+
+    clearErrors();
+
+
+
+    const email =
+    document
+    .getElementById(
+        "email"
+    )
+    .value.trim();
+
+
+
+    const password =
+    passwordInput.value;
+
+
+
+    const button =
+    document
+    .getElementById(
+        "loginButton"
+    );
+
+
+
+    button.disabled =
+    true;
+
+
+    button.innerText =
+    "Signing in...";
+
+
+
+    try{
+
+
+        const response =
+        await fetch(
+            "http://127.0.0.1:8000/api/login",
+            {
+
+            method:"POST",
+
+            headers:{
+
+                "Content-Type":
+                "application/json"
+
+            },
+
+
+            body:JSON.stringify({
+
+                email,
+
+                password
+
+            })
+
+            }
+        );
+
+
+
+        const data =
+        await response.json();
+
+
+
+
+        if(!response.ok){
+
+
+            document
+            .getElementById(
+                "email"
+            )
+            .classList.add(
+                "error"
+            );
+
+
+            document
+            .getElementById(
+                "password"
+            )
+            .classList.add(
+                "error"
+            );
+
+
+            document
+            .getElementById(
+                "loginMessage"
+            )
+            .innerText =
+            data.detail ||
+            "Invalid email or password";
+
+
+            return;
+
+        }
+
+
+
+
+
+
+
+        if(
+            data.user.role !== selectedRole
+        ){
+
+
+            document
+            .getElementById(
+                "email"
+            )
+            .classList.add(
+                "error"
+            );
+
+
+            document
+            .getElementById(
+                "password"
+            )
+            .classList.add(
+                "error"
+            );
+
+
+            document
+            .getElementById(
+                "loginMessage"
+            )
+            .innerText =
+            `This account is not registered as ${selectedRole}`;
+
+
+            return;
+
+        }
+
+
+
+
+
+
+
+        localStorage.setItem(
+            "access_token",
+            data.access_token
+        );
+
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(
+                data.user
+            )
+        );
+
+
+
+        document
+        .getElementById(
+            "loginMessage"
+        )
+        .className =
+        "success-message";
+
+
+
+        document
+        .getElementById(
+            "loginMessage"
+        )
+        .innerText =
+        "Login successful";
+
+
+
+
+
+        setTimeout(
+            ()=>{
+
+
+                if(
+                    data.user.role === "owner"
+                ){
+
+                    window.location.href =
+                    "admin-dashboard.html";
+
+                }
+
+                else{
+
+                    window.location.href =
+                    "dashboard.html";
+
+                }
+
+
+            },
+            800
+        );
+
+
+
+    }
+
+
+    catch(error){
+
+
+        document
+        .getElementById(
+            "email"
+        )
+        .classList.add(
+            "error"
+        );
+
+
+        document
+        .getElementById(
+            "password"
+        )
+        .classList.add(
+            "error"
+        );
+
+
+        document
+        .getElementById(
+            "loginMessage"
+        )
+        .innerText =
+        "Unable to connect to server";
+
+
+    }
+
+
+
+    finally{
+
+
+        button.disabled =
+        false;
+
+
+        button.innerText =
+        "Login";
+
+
+    }
+
+
+});
+
+
+</script>
 
 
 </body>
 
 </html>
+
+

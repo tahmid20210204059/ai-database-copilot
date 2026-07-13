@@ -5,1074 +5,385 @@ DATABASE CONNECTION MANAGEMENT
 
 let selectedConnection = null;
 let editingConnectionId = null;
+let cachedConnections = [];
 
-const API_BASE_URL =
-"http://127.0.0.1:8000";
-
-
-
-function getToken(){
-
-    return localStorage.getItem(
-        "access_token"
-    );
-
+function getConnectionFormValue(id){
+    const element = document.getElementById(id);
+    return element ? element.value : "";
 }
 
-
-
-function authHeaders(){
-
+function getConnectionFormData(){
     return {
-
-        "Content-Type":
-        "application/json",
-
-        "Authorization":
-        `Bearer ${getToken()}`
-
+        connection_name: getConnectionFormValue("connection_name").trim(),
+        database_name: getConnectionFormValue("database_name").trim(),
+        host: getConnectionFormValue("host").trim(),
+        port: Number(getConnectionFormValue("port")),
+        username: getConnectionFormValue("username").trim(),
+        password: getConnectionFormValue("password"),
     };
-
 }
 
+function setMetricValue(id, value){
+    const element = document.getElementById(id);
 
-
-
-function getErrorMessage(data){
-
-    if(!data){
-
-        return "Unknown error";
-
+    if(element){
+        element.innerText = value;
     }
-
-
-    if(typeof data.detail === "string"){
-
-        return data.detail;
-
-    }
-
-
-    if(Array.isArray(data.detail)){
-
-        return data.detail
-        .map(
-            item =>
-            item.msg || "Validation error"
-        )
-        .join(", ");
-
-    }
-
-
-    if(typeof data.detail === "object"){
-
-        return JSON.stringify(data.detail);
-
-    }
-
-
-    return "Request failed";
-
 }
 
-
-
-
-
-function updateConnectionStats(
-    connections
-){
-
-    const total =
-    document.getElementById(
-        "totalConnections"
-    );
-
-
-    if(total){
-
-        total.innerText =
-        connections.length;
-
-    }
-
+function updateConnectionStats(connections){
+    setMetricValue("totalConnections", String(connections.length));
 }
 
+function setContainerMessage(message){
+    const container = document.getElementById("connectionsContainer");
 
+    if(!container){
+        return;
+    }
 
+    container.replaceChildren();
 
+    const card = document.createElement("div");
+    card.className = "ui-card";
 
+    const heading = document.createElement("h3");
+    heading.textContent = message;
 
+    card.appendChild(heading);
+    container.appendChild(card);
+}
+
+function createDetailLine(label, value){
+    const line = document.createElement("p");
+    const labelNode = document.createTextNode(`${label}: `);
+    const valueNode = document.createElement("span");
+
+    valueNode.textContent = value;
+    line.appendChild(labelNode);
+    line.appendChild(valueNode);
+
+    return line;
+}
+
+function createActionButton(label, className, handler){
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = className;
+    button.textContent = label;
+    button.addEventListener("click", handler);
+
+    return button;
+}
+
+function renderConnectionCard(connection){
+    const card = document.createElement("div");
+    const title = document.createElement("h3");
+    const statusLine = document.createElement("p");
+    const statusLabel = document.createElement("span");
+    const buttons = document.createElement("div");
+
+    const lastTested = connection.last_tested_at
+        ? new Date(connection.last_tested_at).toLocaleString()
+        : "Not tested yet";
+
+    card.className = "ui-card premium-hover";
+
+    title.className = "connection-name";
+    title.textContent = connection.connection_name || "Unnamed connection";
+
+    statusLine.textContent = "Status: ";
+    statusLabel.className = connection.is_active ? "badge badge-success" : "badge badge-danger";
+    statusLabel.textContent = connection.is_active ? "Connected" : "Inactive";
+    statusLine.appendChild(statusLabel);
+
+    buttons.className = "connection-actions";
+    buttons.style.marginTop = "16px";
+    buttons.style.display = "flex";
+    buttons.style.flexWrap = "wrap";
+    buttons.style.gap = "10px";
+
+    buttons.appendChild(createActionButton("Test", "ui-btn ui-btn-success test-btn", function(){
+        testExistingConnection(connection.id);
+    }));
+    buttons.appendChild(createActionButton("Edit", "ui-btn ui-btn-primary edit-btn", function(){
+        editConnection(connection.id);
+    }));
+    buttons.appendChild(createActionButton("Delete", "ui-btn ui-btn-danger delete-btn", function(){
+        deleteConnection(connection.id);
+    }));
+
+    card.appendChild(title);
+    card.appendChild(createDetailLine("Host", connection.host || "No data available"));
+    card.appendChild(createDetailLine("Port", String(connection.port ?? "No data available")));
+    card.appendChild(createDetailLine("Username", connection.username || "No data available"));
+    card.appendChild(createDetailLine("Last Tested", lastTested));
+    card.appendChild(statusLine);
+    card.appendChild(buttons);
+
+    return card;
+}
+
+function renderConnections(connections){
+    const container = document.getElementById("connectionsContainer");
+
+    if(!container){
+        return;
+    }
+
+    cachedConnections = Array.isArray(connections) ? connections : [];
+    container.replaceChildren();
+
+    if(cachedConnections.length === 0){
+        const card = document.createElement("div");
+        const heading = document.createElement("h3");
+        const paragraph = document.createElement("p");
+
+        card.className = "ui-card";
+        heading.textContent = "No Connections";
+        paragraph.textContent = "Add your first database connection to get started.";
+
+        card.appendChild(heading);
+        card.appendChild(paragraph);
+        container.appendChild(card);
+        return;
+    }
+
+    cachedConnections.forEach(function(connection){
+        container.appendChild(renderConnectionCard(connection));
+    });
+}
+
+function getErrorMessage(error){
+    if(!error){
+        return "Request failed";
+    }
+
+    return error.message || "Request failed";
+}
 
 async function loadConnections(){
-
-    const container =
-    document.getElementById(
-        "connectionsContainer"
-    );
-
-
-    if(!container)
-    return;
-
-
+    setContainerMessage("Loading connections...");
 
     try{
-
-
-        const response =
-        await fetch(
-            `${API_BASE_URL}/api/connections`,
-            {
-
-            method:"GET",
-
-            headers:{
-
-                "Authorization":
-                `Bearer ${getToken()}`
-
-            }
-
-            }
-
-        );
-
-
-
-        const data =
-        await response.json();
-
-
-
-        if(!response.ok){
-
-            throw new Error(
-                getErrorMessage(data)
-            );
-
-        }
-
-
-
-        updateConnectionStats(
-            data
-        );
-
-
-        renderConnections(
-            data
-        );
-
-
+        const connections = await window.apiGet("/api/connections");
+        updateConnectionStats(connections);
+        renderConnections(connections);
     }
-
-
     catch(error){
-
         console.error(error);
-
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-
-}
-
-
-
-
-
-
-
-function renderConnections(
-    connections
-){
-
-
-    const container =
-    document.getElementById(
-        "connectionsContainer"
-    );
-
-
-    if(!container)
-    return;
-
-
-
-    container.innerHTML = "";
-
-
-
-    if(connections.length === 0){
-
-
-        container.innerHTML = `
-
-        <div class="ui-card">
-
-        <h3>
-        No Connections
-        </h3>
-
-        <p>
-        Add your first database connection.
-        </p>
-
-        </div>
-
-        `;
-
-        return;
-
-    }
-
-
-
-
-
-    connections.forEach(
-        connection => {
-
-
-        const status =
-        connection.is_active
-        ?
-        "Connected"
-        :
-        "Inactive";
-
-
-
-        const statusClass =
-        connection.is_active
-        ?
-        "badge-success"
-        :
-        "badge-danger";
-
-
-
-        const lastTest =
-        connection.last_tested_at
-        ?
-        new Date(
-            connection.last_tested_at
-        ).toLocaleString()
-        :
-        "Not tested yet";
-
-
-
-        const card =
-        document.createElement(
-            "div"
-        );
-
-
-        card.className =
-        "ui-card premium-hover";
-
-
-
-        card.innerHTML = `
-
-        <h3>
-        ${connection.connection_name}
-        </h3>
-
-
-        <p>
-        Database:
-        ${connection.database_name}
-        </p>
-
-
-        <p>
-        Host:
-        ${connection.host}
-        </p>
-
-
-        <p>
-        Port:
-        ${connection.port}
-        </p>
-
-
-        <p>
-        Username:
-        ${connection.username}
-        </p>
-
-
-        <p>
-        Status:
-
-        <span class="badge ${statusClass}">
-        ${status}
-        </span>
-
-        </p>
-
-
-        <p>
-        Last Tested:
-        ${lastTest}
-        </p>
-
-
-
-        <div style="margin-top:20px;">
-
-
-        <button
-        class="ui-btn ui-btn-success"
-        onclick="testExistingConnection(${connection.id})">
-
-        Test
-
-        </button>
-
-
-        <button
-        class="ui-btn ui-btn-primary"
-        onclick="editConnection(${connection.id})">
-
-        Edit
-
-        </button>
-
-
-
-        <button
-        class="ui-btn ui-btn-danger"
-        onclick="deleteConnection(${connection.id})">
-
-        Delete
-
-        </button>
-
-
-        </div>
-
-        `;
-
-
-        container.appendChild(
-            card
-        );
-
-
+        setMetricValue("totalConnections", "0");
+        setContainerMessage(`Failed to load connections: ${getErrorMessage(error)}`);
+        if(typeof showToast === "function"){
+            showToast(getErrorMessage(error), "error");
         }
-
-
-    );
-
-
+    }
 }
-
-
-
-
-
-
-
-
 
 async function testConnection(){
-
-    const data =
-    getConnectionFormData();
-
-
+    const data = getConnectionFormData();
 
     try{
-
-
-        const response =
-        await fetch(
-            `${API_BASE_URL}/api/connections/test`,
-            {
-
-            method:"POST",
-
-            headers:
-            authHeaders(),
-
-            body:
-            JSON.stringify(data)
-
-            }
-
-        );
-
-
-        const result =
-        await response.json();
-
-
-
-        if(!response.ok){
-
-            throw new Error(
-                getErrorMessage(result)
-            );
-
+        await window.apiPost("/api/connections/test", data);
+        if(typeof showToast === "function"){
+            showToast("Connection successful", "success");
         }
-
-
-
-        showToast(
-            "Connection successful",
-            "success"
-        );
-
-
     }
-
-
     catch(error){
-
-        showToast(
-            error.message,
-            "error"
-        );
-
+        if(typeof showToast === "function"){
+            showToast(getErrorMessage(error), "error");
+        }
     }
-
-
 }
 
+async function saveConnection(event){
+    event.preventDefault();
 
-
-
-
-
-
-
-
-async function saveConnection(e){
-
-    e.preventDefault();
-
-
-    const data =
-    getConnectionFormData();
-
-
-
-    const url =
-    editingConnectionId
-    ?
-    `${API_BASE_URL}/api/connections/${editingConnectionId}`
-    :
-    `${API_BASE_URL}/api/connections`;
-
-
-
-    const method =
-    editingConnectionId
-    ?
-    "PUT"
-    :
-    "POST";
-
-
+    const data = getConnectionFormData();
+    const isEditing = Boolean(editingConnectionId);
+    const url = isEditing
+        ? `/api/connections/${editingConnectionId}`
+        : "/api/connections";
 
     try{
-
-
-        const response =
-        await fetch(
-            url,
-            {
-
-            method:method,
-
-            headers:
-            authHeaders(),
-
-            body:
-            JSON.stringify(data)
-
-            }
-
-        );
-
-
-
-        const result =
-        await response.json();
-
-
-
-        if(!response.ok){
-
-            throw new Error(
-                getErrorMessage(result)
-            );
-
+        if(isEditing){
+            await window.apiPut(url, data);
+        }
+        else{
+            await window.apiPost(url, data);
         }
 
-
-
-        showToast(
-            editingConnectionId
-            ?
-            "Connection updated"
-            :
-            "Connection saved",
-            "success"
-        );
-
-
+        if(typeof showToast === "function"){
+            showToast(isEditing ? "Connection updated" : "Connection saved", "success");
+        }
 
         editingConnectionId = null;
 
+        const form = document.getElementById("connectionForm");
+        if(form){
+            form.reset();
+        }
 
+        const saveButton = document.getElementById("saveConnectionBtn");
+        if(saveButton){
+            saveButton.innerText = "Save Connection";
+        }
 
-        document
-        .getElementById(
-            "connectionForm"
-        )
-        .reset();
-
-
-
-        document
-        .getElementById(
-            "saveConnectionBtn"
-        )
-        .innerText =
-        "Save Connection";
-
-
-
-        loadConnections();
-
-
+        await loadConnections();
     }
-
-
     catch(error){
-
-        showToast(
-            error.message,
-            "error"
-        );
-
+        if(typeof showToast === "function"){
+            showToast(getErrorMessage(error), "error");
+        }
     }
-
-
 }
 
-
-
-
-
-
-
-
 async function editConnection(id){
+    let connection = cachedConnections.find(function(item){
+        return item.id === id;
+    });
 
-    const response =
-    await fetch(
-        `${API_BASE_URL}/api/connections`,
-        {
+    if(!connection){
+        await loadConnections();
+        connection = cachedConnections.find(function(item){
+            return item.id === id;
+        });
 
-        headers:{
-
-            "Authorization":
-            `Bearer ${getToken()}`
-
+        if(!connection){
+            if(typeof showToast === "function"){
+                showToast("Connection not found", "error");
+            }
+            return;
         }
-
-        }
-
-    );
-
-
-    const connections =
-    await response.json();
-
-
-
-    const connection =
-    connections.find(
-        item =>
-        item.id === id
-    );
-
-
-
-    if(!connection)
-    return;
-
-
+    }
 
     editingConnectionId = id;
 
-
-
-    document.getElementById(
-        "connection_name"
-    ).value =
-    connection.connection_name;
-
-
-
-    document.getElementById(
-        "database_name"
-    ).value =
-    connection.database_name;
-
-
-
-    document.getElementById(
-        "host"
-    ).value =
-    connection.host;
-
-
-
-    document.getElementById(
-        "port"
-    ).value =
-    connection.port;
-
-
-
-    document.getElementById(
-        "username"
-    ).value =
-    connection.username;
-
-
-
-    document.getElementById(
-        "saveConnectionBtn"
-    ).innerText =
-    "Update Connection";
-
-
-
-    window.scrollTo({
-
-        top:0,
-
-        behavior:"smooth"
-
-    });
-
-
-}
-
-
-
-
-
-
-
-
-
-async function deleteConnection(id){
-
-
-    if(
-        !confirm(
-            "Delete this connection?"
-        )
-    )
-    return;
-
-
-
-    try{
-
-
-        const response =
-        await fetch(
-            `${API_BASE_URL}/api/connections/${id}`,
-            {
-
-            method:"DELETE",
-
-            headers:{
-
-                "Authorization":
-                `Bearer ${getToken()}`
-
-            }
-
-            }
-
-        );
-
-
-
-        const result =
-        await response.json();
-
-
-
-        if(!response.ok){
-
-            throw new Error(
-                getErrorMessage(result)
-            );
-
-        }
-
-
-
-        showToast(
-            "Connection deleted",
-            "success"
-        );
-
-
-        loadConnections();
-
-
-    }
-
-
-    catch(error){
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-
-}
-
-
-
-
-
-
-
-
-function testExistingConnection(id){
-
-    selectedConnection =
-    id;
-
-
-    document
-    .getElementById(
-        "testModal"
-    )
-    .classList
-    .remove(
-        "hidden"
-    );
-
-}
-
-
-
-
-
-
-
-
-
-function closeTestModal(){
-
-    document
-    .getElementById(
-        "testModal"
-    )
-    .classList
-    .add(
-        "hidden"
-    );
-
-
-    document
-    .getElementById(
-        "testPassword"
-    )
-    .value = "";
-
-}
-
-
-
-
-
-
-
-
-
-async function testSavedConnection(){
-
-    const password =
-    document
-    .getElementById(
-        "testPassword"
-    )
-    .value;
-
-
-
-    const response =
-    await fetch(
-        `${API_BASE_URL}/api/connections`,
-        {
-
-        headers:{
-
-            "Authorization":
-            `Bearer ${getToken()}`
-
-        }
-
-        }
-
-    );
-
-
-    const connections =
-    await response.json();
-
-
-
-    const connection =
-    connections.find(
-        item =>
-        item.id === selectedConnection
-    );
-
-
-
-    try{
-
-
-        const testResponse =
-        await fetch(
-            `${API_BASE_URL}/api/connections/test`,
-            {
-
-            method:"POST",
-
-            headers:
-            authHeaders(),
-
-            body:
-            JSON.stringify({
-
-                connection_name:
-                connection.connection_name,
-
-                host:
-                connection.host,
-
-                port:
-                connection.port,
-
-                database_name:
-                connection.database_name,
-
-                username:
-                connection.username,
-
-                password:
-                password
-
-            })
-
-            }
-
-        );
-
-
-
-        const result =
-        await testResponse.json();
-
-
-
-        if(!testResponse.ok){
-
-            throw new Error(
-                getErrorMessage(result)
-            );
-
-        }
-
-
-
-        showToast(
-            "Connection successful",
-            "success"
-        );
-
-
-        closeTestModal();
-
-
-        loadConnections();
-
-
-    }
-
-
-    catch(error){
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-
-}
-
-
-
-
-
-
-
-
-
-function getConnectionFormData(){
-
-
-    return {
-
-
-        connection_name:
-        document.getElementById(
-            "connection_name"
-        ).value.trim(),
-
-
-
-        database_name:
-        document.getElementById(
-            "database_name"
-        ).value.trim(),
-
-
-
-        host:
-        document.getElementById(
-            "host"
-        ).value.trim(),
-
-
-
-        port:
-        Number(
-            document.getElementById(
-                "port"
-            ).value
-        ),
-
-
-
-        username:
-        document.getElementById(
-            "username"
-        ).value.trim(),
-
-
-
-        password:
-        document.getElementById(
-            "password"
-        ).value
-
-
+    const fields = {
+        connection_name: connection.connection_name,
+        database_name: connection.database_name,
+        host: connection.host,
+        port: connection.port,
+        username: connection.username,
     };
 
+    Object.keys(fields).forEach(function(key){
+        const element = document.getElementById(key);
 
+        if(element){
+            element.value = fields[key] ?? "";
+        }
+    });
+
+    const saveButton = document.getElementById("saveConnectionBtn");
+    if(saveButton){
+        saveButton.innerText = "Update Connection";
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
 }
 
+async function deleteConnection(id){
+    if(!confirm("Delete this connection?")){
+        return;
+    }
 
+    try{
+        await window.apiDelete(`/api/connections/${id}`);
 
+        if(typeof showToast === "function"){
+            showToast("Connection deleted", "success");
+        }
 
+        await loadConnections();
+    }
+    catch(error){
+        if(typeof showToast === "function"){
+            showToast(getErrorMessage(error), "error");
+        }
+    }
+}
 
+function testExistingConnection(id){
+    selectedConnection = id;
 
+    const modal = document.getElementById("testModal");
+    if(modal){
+        modal.classList.remove("hidden");
+    }
+}
 
+function closeTestModal(){
+    const modal = document.getElementById("testModal");
+    const password = document.getElementById("testPassword");
 
+    if(modal){
+        modal.classList.add("hidden");
+    }
 
-document.addEventListener(
-"DOMContentLoaded",
-()=>{
+    if(password){
+        password.value = "";
+    }
+}
 
+async function testSavedConnection(){
+    const connection = cachedConnections.find(function(item){
+        return item.id === selectedConnection;
+    });
 
+    if(!connection){
+        if(typeof showToast === "function"){
+            showToast("No connection selected", "error");
+        }
+        return;
+    }
+
+    const passwordField = document.getElementById("testPassword");
+    const password = passwordField ? passwordField.value : "";
+
+    try{
+        await window.apiPost("/api/connections/test", {
+            connection_name: connection.connection_name,
+            host: connection.host,
+            port: connection.port,
+            database_name: connection.database_name,
+            username: connection.username,
+            password: password,
+        });
+
+        if(typeof showToast === "function"){
+            showToast("Connection successful", "success");
+        }
+
+        closeTestModal();
+        await loadConnections();
+    }
+    catch(error){
+        if(typeof showToast === "function"){
+            showToast(getErrorMessage(error), "error");
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
     loadConnections();
 
-
-
-    const form =
-    document.getElementById(
-        "connectionForm"
-    );
-
-
-
+    const form = document.getElementById("connectionForm");
     if(form){
-
-        form.addEventListener(
-            "submit",
-            saveConnection
-        );
-
+        form.addEventListener("submit", saveConnection);
     }
 
-
-
-    const testButton =
-    document.getElementById(
-        "testConnectionBtn"
-    );
-
-
-
+    const testButton = document.getElementById("testConnectionBtn");
     if(testButton){
-
-        testButton.addEventListener(
-            "click",
-            testConnection
-        );
-
+        testButton.addEventListener("click", testConnection);
     }
 
-
-
-
-    const confirmTestBtn =
-    document.getElementById(
-        "confirmTestBtn"
-    );
-
-
-
+    const confirmTestBtn = document.getElementById("confirmTestBtn");
     if(confirmTestBtn){
-
-        confirmTestBtn.addEventListener(
-            "click",
-            testSavedConnection
-        );
-
+        confirmTestBtn.addEventListener("click", testSavedConnection);
     }
-
-
 });

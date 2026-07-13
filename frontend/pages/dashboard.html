@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>
@@ -21,6 +22,7 @@ AI Database Copilot Dashboard
 </head>
 
 
+
 <body>
 
 
@@ -36,7 +38,11 @@ AI Database Copilot Dashboard
 
 
 
+
+
 <div class="app-container">
+
+
 
 
 
@@ -49,7 +55,11 @@ data-replace="true">
 
 
 
+
+
 <div class="main-area">
+
+
 
 
 
@@ -66,8 +76,6 @@ data-replace="true">
 
 
 
-
-
 <div class="content-wrapper">
 
 
@@ -77,16 +85,28 @@ data-replace="true">
 
 
 
+
+
+
 <section class="hero">
 
 
 <h1>
-Welcome back, <span id="welcomeName">User</span> 👋
+
+Welcome back,
+<span id="welcomeName">
+User
+</span>
+👋
+
 </h1>
+
 
 <p>
 Your AI database workspace is ready.
 </p>
+
+
 
 
 
@@ -121,39 +141,54 @@ All Systems Operational
 <section class="dashboard-grid">
 
 
-<div 
+
+<div
 data-component="card"
 data-title="Database Connections"
-data-value="12"
-data-description="Active databases">
+data-value="0"
+data-id="totalConnections"
+data-description="Connected databases">
 </div>
 
 
 
-<div 
+
+
+
+<div
 data-component="card"
-data-title="AI Queries Today"
-data-value="245"
+data-value="0"
+data-id="totalQueries"
+data-title="Total AI Queries"
 data-description="Generated SQL requests">
 </div>
 
 
 
-<div 
+
+
+
+<div
 data-component="card"
+data-value="0%"
+data-id="successRate"
 data-title="Success Rate"
-data-value="98%"
-data-description="Execution accuracy">
+data-description="Successful executions">
 </div>
 
 
 
-<div 
+
+
+
+<div
 data-component="card"
+data-value="--"
 data-title="Average Response"
-data-value="1.2s"
 data-description="Query execution speed">
 </div>
+
+
 
 
 </section>
@@ -175,7 +210,11 @@ Quick Actions
 
 
 
+
+
 <div class="dashboard-grid">
+
+
 
 
 
@@ -264,6 +303,8 @@ data-href="history.html">
 
 
 
+
+
 </div>
 
 
@@ -283,6 +324,7 @@ data-href="history.html">
 <h2>
 AI Processing Pipeline
 </h2>
+
 
 
 
@@ -366,6 +408,7 @@ System Status
 
 
 
+
 <div class="ui-card">
 
 
@@ -406,6 +449,8 @@ Recent Activity
 
 
 
+
+
 <div class="ui-card table-wrapper">
 
 
@@ -421,9 +466,11 @@ Recent Activity
 Query
 </th>
 
+
 <th>
 Status
 </th>
+
 
 <th>
 Time
@@ -437,66 +484,30 @@ Time
 
 
 
-<tbody>
+
+<tbody id="recentActivityBody">
 
 
 <tr>
 
 
-<td>
-Show top customers
-</td>
+<td colspan="3">
 
+No recent activity
 
-<td>
-
-<span class="badge badge-success">
-Success
-</span>
-
-</td>
-
-
-<td>
-1.2s
 </td>
 
 
 </tr>
 
-
-
-
-
-<tr>
-
-
-<td>
-Revenue analysis
-</td>
-
-
-<td>
-
-<span class="badge badge-success">
-Success
-</span>
-
-</td>
-
-
-<td>
-2.1s
-</td>
-
-
-</tr>
 
 
 </tbody>
 
 
+
 </table>
+
 
 
 </div>
@@ -525,6 +536,7 @@ Test Notification
 
 
 
+
 </main>
 
 
@@ -534,15 +546,31 @@ Test Notification
 </div>
 
 
+</div>
 
+
+
+
+
+
+
+<script src="../assets/js/api.js"></script>
 
 <script src="../assets/js/auth-guard.js"></script>
 
-<script src="../assets/js/auth.js"></script>
-
 <script src="../assets/js/components.js"></script>
 
+<script src="../assets/js/user-guard.js"></script>
+
+<script src="../assets/js/navigation.js"></script>
+
+<script src="../assets/js/auth.js"></script>
+
+<script src="../assets/js/dashboard.js"></script>
+
 <script src="../assets/js/globe.js"></script>
+
+
 
 
 </body>

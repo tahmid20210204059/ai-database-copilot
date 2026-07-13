@@ -34,6 +34,13 @@ class User(Base):
         nullable=False,
     )
 
+    role: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default=text("'user'"),
+        index=True,
+    )
+
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         nullable=False,
@@ -59,4 +66,4 @@ class User(Base):
     )
 
     def __repr__(self) -> str:
-        return f"User(id={self.id}, email={self.email!r})"
+        return f"User(id={self.id}, email={self.email!r}, role={self.role!r})"

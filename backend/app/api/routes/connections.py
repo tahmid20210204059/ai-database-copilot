@@ -7,7 +7,7 @@ from fastapi import (
 
 from sqlalchemy.orm import Session
 
-from ...auth.jwt_handler import get_current_user
+from ...auth.permissions import require_user
 
 from ...database import get_app_db
 
@@ -34,11 +34,19 @@ router = APIRouter(
 
 
 
+
 @router.post("/test")
 def test_connection(
     connection_data: ConnectionCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
 ):
+    """
+    Test external database connection.
+
+    User role required.
+    Database information is not saved.
+    """
+
 
     result = connection_service.test_connection(
         host=connection_data.host,
@@ -63,6 +71,8 @@ def test_connection(
 
 
 
+
+
 @router.post(
     "",
     response_model=ConnectionResponse,
@@ -71,8 +81,15 @@ def test_connection(
 def create_connection(
     connection_data: ConnectionCreate,
     database: Session = Depends(get_app_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
 ):
+    """
+    Save new database connection.
+
+    Only normal users can create
+    their own database connections.
+    """
+
 
     try:
 
@@ -84,6 +101,7 @@ def create_connection(
             )
         )
 
+
     except DuplicateConnectionError as exc:
 
         raise HTTPException(
@@ -92,7 +110,10 @@ def create_connection(
         ) from exc
 
 
+
     return connection
+
+
 
 
 
@@ -104,8 +125,12 @@ def create_connection(
 )
 def get_connections(
     database: Session = Depends(get_app_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
 ):
+    """
+    Return only current user's connections.
+    """
+
 
     return (
         connection_service.get_user_connections(
@@ -113,6 +138,10 @@ def get_connections(
             user_id=current_user.id,
         )
     )
+
+
+
+
 
 
 
@@ -126,8 +155,11 @@ def update_connection(
     connection_id: int,
     connection_data: ConnectionCreate,
     database: Session = Depends(get_app_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
 ):
+    """
+    Update only user's own connection.
+    """
 
 
     updated = (
@@ -154,14 +186,20 @@ def update_connection(
 
 
 
+
+
 @router.delete(
     "/{connection_id}",
 )
 def delete_connection(
     connection_id: int,
     database: Session = Depends(get_app_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_user),
 ):
+    """
+    Delete only user's own connection.
+    """
+
 
     deleted = (
         connection_service.delete_connection(

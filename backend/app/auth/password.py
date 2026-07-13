@@ -2,20 +2,63 @@ from passlib.context import CryptContext
 
 
 password_context = CryptContext(
-    schemes=["bcrypt"],
+    schemes=[
+        "bcrypt"
+    ],
     deprecated="auto",
 )
 
 
-def hash_password(password: str) -> str:
+
+MAX_PASSWORD_LENGTH = 72
+
+
+
+def _normalize_password(
+    password: str
+) -> str:
     """
-    Hash plain password using bcrypt.
+    Normalize password before hashing
+    and verification.
+
     bcrypt supports maximum 72 bytes.
     """
 
-    password = password[:72]
+    if not password:
 
-    return password_context.hash(password)
+        raise ValueError(
+            "Password cannot be empty"
+        )
+
+
+    return password[:MAX_PASSWORD_LENGTH]
+
+
+
+
+
+def hash_password(
+    password: str
+) -> str:
+    """
+    Hash plain password using bcrypt.
+
+    Used during:
+    - User registration
+    - Admin/Owner creation
+    """
+
+    password = _normalize_password(
+        password
+    )
+
+
+    return password_context.hash(
+        password
+    )
+
+
+
 
 
 def verify_password(
@@ -23,10 +66,15 @@ def verify_password(
     password_hash: str,
 ) -> bool:
     """
-    Verify password against stored hash.
+    Verify plain password against
+    stored bcrypt hash.
     """
 
-    plain_password = plain_password[:72]
+
+    plain_password = _normalize_password(
+        plain_password
+    )
+
 
     return password_context.verify(
         plain_password,

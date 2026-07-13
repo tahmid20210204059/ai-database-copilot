@@ -14,18 +14,13 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 
-from ...auth.jwt_handler import get_current_user
+from ...auth.permissions import require_user
 
 from ...models.user import User
 
 
 from ...schemas.explanation import (
     SQLExplanationResponse,
-)
-
-
-from ...schemas.error import (
-    APIErrorResponse,
 )
 
 
@@ -41,7 +36,10 @@ from ...utils.ai_exceptions import (
 
 
 
+
+
 logger = logging.getLogger(__name__)
+
 
 
 
@@ -55,6 +53,10 @@ router = APIRouter(
     ],
 
 )
+
+
+
+
 
 
 
@@ -93,6 +95,9 @@ class SQLExplanationAPIRequest(BaseModel):
 
 
 
+
+
+
 @router.post(
     "/explain",
     response_model=SQLExplanationResponse,
@@ -102,12 +107,14 @@ def explain_sql(
     request: SQLExplanationAPIRequest,
 
     current_user: User = Depends(
-        get_current_user
+        require_user
     ),
 
 ):
     """
     Generate human-readable SQL explanation.
+
+    Only normal users can use AI explanation.
 
     This endpoint:
 
@@ -147,6 +154,7 @@ def explain_sql(
 
 
 
+
     except ValueError as error:
 
 
@@ -157,6 +165,8 @@ def explain_sql(
             detail=str(error),
 
         )
+
+
 
 
 
@@ -201,6 +211,9 @@ def explain_sql(
 
 
 
+
+
+
     except AITimeoutError as error:
 
 
@@ -230,6 +243,9 @@ def explain_sql(
             },
 
         )
+
+
+
 
 
 

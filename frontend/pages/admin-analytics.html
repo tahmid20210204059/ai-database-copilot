@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Analytics</title>
+<link rel="stylesheet" href="../assets/css/main.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/effects.css">
+<link rel="stylesheet" href="../assets/css/common-background.css">
+<style>
+    .admin-shell {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .admin-shell.is-ready {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+</style>
+</head>
+
+<body data-role="owner">
+<div id="common-background"></div>
+
+<div class="app-container admin-shell is-loading" id="adminShell">
+    <aside class="sidebar" id="adminSidebar" aria-label="Admin navigation">
+        <div class="logo">
+            <div class="logo-icon">AI</div>
+            <span>Database Copilot</span>
+        </div>
+
+        <nav class="menu">
+            <a href="admin-dashboard.html" class="menu-item" data-page="admin-dashboard.html">Admin Dashboard</a>
+            <a href="admin-users.html" class="menu-item" data-page="admin-users.html">Users</a>
+            <a href="admin-connections.html" class="menu-item" data-page="admin-connections.html">Databases</a>
+            <a href="admin-analytics.html" class="menu-item active" data-page="admin-analytics.html">Analytics</a>
+            <a href="#logout" class="menu-item" data-action="logout">Logout</a>
+        </nav>
+    </aside>
+
+    <div class="main-area">
+        <header class="navbar" id="adminNavbar">
+            <div class="navbar-left">
+                <h3 id="pageTitle">Admin Analytics</h3>
+            </div>
+
+            <div class="user-box">
+                <div class="user-info">
+                    <div class="user-name" id="adminName">Admin</div>
+                    <div class="user-role" id="adminRole">Owner</div>
+                </div>
+
+                <div class="avatar" id="adminAvatar">AD</div>
+
+                <button class="ui-btn ui-btn-danger logout-btn" id="adminLogoutBtn" type="button">
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="page-content">
+                <section class="hero">
+                    <h1>Platform Analytics</h1>
+                    <p>Review the live platform statistics available from the admin API.</p>
+                </section>
+
+                <section class="section">
+                    <h2>Platform Overview</h2>
+
+                    <div class="ui-card">
+                        <div class="dashboard-grid">
+                            <div class="ui-card premium-hover">
+                                <div class="ui-card-title">Total Users</div>
+                                <div class="ui-card-value" id="totalUsers">Loading...</div>
+                                <p>Registered accounts</p>
+                            </div>
+
+                            <div class="ui-card premium-hover">
+                                <div class="ui-card-title">Total Databases</div>
+                                <div class="ui-card-value" id="totalConnections">Loading...</div>
+                                <p>Connected database count</p>
+                            </div>
+
+                            <div class="ui-card premium-hover">
+                                <div class="ui-card-title">Total Queries</div>
+                                <div class="ui-card-value" id="totalQueries">Loading...</div>
+                                <p>Generated query volume</p>
+                            </div>
+                        </div>
+
+                        <p id="analyticsNote" style="margin-top: 18px;">Live values are sourced from the current admin stats API.</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>User Statistics</h2>
+
+                    <div class="ui-card premium-hover">
+                        <p id="userStatistics">Data not available from current API.</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Database Statistics</h2>
+
+                    <div class="ui-card premium-hover">
+                        <p id="databaseStatistics">Data not available from current API.</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Query Statistics</h2>
+
+                    <div class="ui-card premium-hover">
+                        <p id="queryStatistics">Data not available from current API.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/js/common-background.js"></script>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/navigation.js"></script>
+<script src="../assets/js/owner-guard.js"></script>
+<script src="../assets/js/admin-analytics.js"></script>
+</body>
+</html>

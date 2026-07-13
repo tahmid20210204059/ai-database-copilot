@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<link rel="stylesheet" href="../assets/css/main.css">
+<link rel="stylesheet" href="../assets/css/layout.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/effects.css">
+<style>
+    .admin-shell {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .admin-shell.is-ready {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+</style>
+</head>
+
+<body data-role="owner">
+<div class="ai-background"></div>
+
+<div class="app-container admin-shell is-loading" id="adminShell">
+    <aside class="sidebar" id="adminSidebar" aria-label="Admin navigation">
+        <div class="logo">
+            <div class="logo-icon">AI</div>
+            <span>Database Copilot</span>
+        </div>
+
+        <nav class="menu">
+            <a href="admin-dashboard.html" class="menu-item active" data-page="admin-dashboard.html">Admin Dashboard</a>
+            <a href="admin-users.html" class="menu-item" data-page="admin-users.html">Users</a>
+            <a href="admin-connections.html" class="menu-item" data-page="admin-connections.html">Databases</a>
+            <a href="admin-analytics.html" class="menu-item" data-page="admin-analytics.html">Analytics</a>
+            <a href="#logout" class="menu-item" data-action="logout">Logout</a>
+        </nav>
+    </aside>
+
+    <div class="main-area">
+        <header class="navbar" id="adminNavbar">
+            <div class="navbar-left">
+                <h3 id="pageTitle">Admin Dashboard</h3>
+            </div>
+
+            <div class="user-box">
+                <div class="user-info">
+                    <div class="user-name" id="adminName">Admin</div>
+                    <div class="user-role" id="adminRole">Owner</div>
+                </div>
+
+                <div class="avatar" id="adminAvatar">AD</div>
+
+                <button class="ui-btn ui-btn-danger logout-btn" id="adminLogoutBtn" type="button">
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="page-content">
+                <section class="hero">
+                    <h1>Welcome Admin</h1>
+                    <p>Command center for platform health, operational alerts, and administrative shortcuts.</p>
+                </section>
+
+                <section class="dashboard-grid">
+                    <div class="ui-card premium-hover">
+                        <div class="ui-card-title">Platform Health</div>
+                        <div class="ui-card-value">Healthy</div>
+                        <p>Core services are operating normally.</p>
+                    </div>
+
+                    <div class="ui-card premium-hover">
+                        <div class="ui-card-title">Security Status</div>
+                        <div class="ui-card-value">Protected</div>
+                        <p>Owner-only admin access is enabled.</p>
+                    </div>
+
+                    <div class="ui-card premium-hover">
+                        <div class="ui-card-title">System Status</div>
+                        <div class="ui-card-value">Online</div>
+                        <p>Platform services are available.</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Platform Metrics</h2>
+
+                    <div class="dashboard-grid">
+                        <div class="ui-card premium-hover">
+                            <div class="ui-card-title">Total Users</div>
+                            <div class="ui-card-value" id="totalUsers">Loading...</div>
+                            <p>Registered platform accounts</p>
+                        </div>
+
+                        <div class="ui-card premium-hover">
+                            <div class="ui-card-title">Total Databases</div>
+                            <div class="ui-card-value" id="totalConnections">Loading...</div>
+                            <p>Saved database connections</p>
+                        </div>
+
+                        <div class="ui-card premium-hover">
+                            <div class="ui-card-title">Total Queries</div>
+                            <div class="ui-card-value" id="totalQueries">Loading...</div>
+                            <p>Recorded query history</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Quick Management Actions</h2>
+
+                    <div class="dashboard-grid">
+                        <div class="ui-card premium-hover">
+                            <h3>Manage Users</h3>
+                            <p>Review user accounts, roles, and status.</p>
+                            <a href="admin-users.html" class="ui-btn ui-btn-primary">Manage Users</a>
+                        </div>
+
+                        <div class="ui-card premium-hover">
+                            <h3>View Databases</h3>
+                            <p>Monitor connected databases and ownership.</p>
+                            <a href="admin-connections.html" class="ui-btn ui-btn-primary">View Databases</a>
+                        </div>
+
+                        <div class="ui-card premium-hover">
+                            <h3>View Analytics</h3>
+                            <p>Open platform insights and trend reporting.</p>
+                            <a href="admin-analytics.html" class="ui-btn ui-btn-primary">View Analytics</a>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/admin-background.js"></script>
+<script src="../assets/js/navigation.js"></script>
+<script src="../assets/js/owner-guard.js"></script>
+<script>
+(function(){
+    function setMetric(id, value){
+        const element = document.getElementById(id);
+
+        if(element){
+            element.textContent = value;
+        }
+    }
+
+    async function loadAdminDashboardStats(){
+        if(!window.__adminAccessGranted || typeof window.adminFetchJson !== "function"){
+            return;
+        }
+
+        try{
+            const data = await window.adminFetchJson("/api/admin/stats");
+
+            setMetric("totalUsers", String(data.total_users));
+            setMetric("totalConnections", String(data.total_connections));
+            setMetric("totalQueries", String(data.total_queries));
+        }
+        catch(error){
+            console.error("Admin dashboard stats error:", error);
+            setMetric("totalUsers", "No data available");
+            setMetric("totalConnections", "No data available");
+            setMetric("totalQueries", "No data available");
+        }
+    }
+
+    window.loadAdminDashboardStats = loadAdminDashboardStats;
+})();
+</script>
+</body>
+</html>
