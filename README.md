@@ -25,22 +25,22 @@ The following screenshots demonstrate different parts of the AI Database Copilot
 
 ### Admin Dashboard
 
-![Admin Dashboard](screenshots/Admin_Dashboard.jpeg)
+![Admin Dashboard](screenshots/Admin_Dashboard.jpg)
 
 
 
 ### User Dashboard
 
-![User Dashboard](screenshots/User_Dashboard.jpeg)
+![User Dashboard](screenshots/User_Dashboard.jpg)
 
 
 
 ### Query History Management
 
-![User History Page](screenshots/User_History_Page.jpeg)
+![User History Page](screenshots/User_History_Page.jpg)
 
 
 
 ### User Management
 
-![User Management Page](screenshots/User_Management_Page.jpeg)
+![User Management Page](screenshots/User_Management_Page.jpg)
