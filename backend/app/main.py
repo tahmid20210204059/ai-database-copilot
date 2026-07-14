@@ -30,6 +30,13 @@ from .api.routes.admin import (
     router as admin_router,
 )
 
+from .api.routes.user import (
+    router as user_router,
+)
+
+from .api.routes.query import (
+    router as query_router,
+)
 
 
 from .config import settings
@@ -43,19 +50,14 @@ from .database import (
 
 
 
-from .api.routes.user import (
-    router as user_router
-)
-
 
 
 app = FastAPI(
 
     title=settings.APP_NAME,
 
-    version=settings.APP.VERSION
-    if hasattr(settings, "APP_VERSION") is False
-    else settings.APP_VERSION,
+    version=
+    settings.APP_VERSION,
 
     description=(
 
@@ -65,6 +67,7 @@ app = FastAPI(
     ),
 
 )
+
 
 
 
@@ -104,28 +107,44 @@ app.include_router(
     auth_router
 )
 
+
 app.include_router(
     connection_router
 )
+
 
 app.include_router(
     schema_router
 )
 
+
 app.include_router(
     ai_router
 )
+
 
 app.include_router(
     history_router
 )
 
+
 app.include_router(
     explanation_router
 )
 
+
 app.include_router(
     admin_router
+)
+
+
+app.include_router(
+    user_router
+)
+
+
+app.include_router(
+    query_router
 )
 
 
@@ -146,6 +165,7 @@ def home() -> dict:
 
         "message":
         settings.APP_NAME,
+
 
         "version":
         settings.APP_VERSION,
@@ -170,6 +190,7 @@ def health_check() -> dict:
 
         "status":
         "healthy",
+
 
         "service":
         settings.APP_NAME,
@@ -263,7 +284,3 @@ def database_health_check() -> dict:
         },
 
     }
-
-app.include_router(
-    user_router
-)

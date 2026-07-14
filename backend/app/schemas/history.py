@@ -4,15 +4,20 @@ from pydantic import BaseModel, Field
 
 
 
+
+
 class HistoryCreate(BaseModel):
     """
     Data required to create query history.
     """
 
+
+
     connection_id: int | None = Field(
         default=None,
         description="Database connection id",
     )
+
 
 
     prompt: str = Field(
@@ -22,16 +27,19 @@ class HistoryCreate(BaseModel):
     )
 
 
+
     generated_sql: str | None = Field(
         default=None,
         description="Generated SQL query",
     )
 
 
+
     explanation: str | None = Field(
         default=None,
         description="AI SQL explanation",
     )
+
 
 
     confidence: float | None = Field(
@@ -42,29 +50,37 @@ class HistoryCreate(BaseModel):
     )
 
 
+
     execution_time_ms: float | None = Field(
         default=None,
-        description="Query execution time",
+        description="Query execution duration in milliseconds",
     )
+
 
 
     rows_returned: int = Field(
         default=0,
         ge=0,
-        description="Returned row count",
+        description="Number of returned rows",
     )
+
 
 
     status: str = Field(
         default="generated",
-        description="Execution status",
+        description="Query lifecycle status",
     )
+
 
 
     error_message: str | None = Field(
         default=None,
-        description="Execution error",
+        description="Execution error message",
     )
+
+
+
+
 
 
 
@@ -73,27 +89,51 @@ class HistoryResponse(BaseModel):
     Query history API response.
     """
 
+
+
     id: int
+
+
 
     connection_id: int | None
 
+
+
     prompt: str
+
+
 
     generated_sql: str | None
 
+
+
     explanation: str | None
+
+
 
     confidence: float | None
 
+
+
     execution_time_ms: float | None
+
+
 
     rows_returned: int
 
+
+
     status: str
+
+
 
     error_message: str | None
 
+
+
     created_at: datetime
+
+
 
 
 
@@ -104,26 +144,45 @@ class HistoryResponse(BaseModel):
 
 
 
+
+
+
 class HistoryFilter(BaseModel):
     """
     Query history filtering options.
     """
 
+
+
     status: str | None = None
+
+
 
     connection_id: int | None = None
 
 
 
+
+
+
+
 class HistoryListResponse(BaseModel):
     """
-    Paginated history response.
+    Paginated query history response.
     """
+
+
 
     items: list[HistoryResponse]
 
+
+
     page: int
 
+
+
     page_size: int
+
+
 
     total: int

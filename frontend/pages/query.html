@@ -7,31 +7,191 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <title>
-AI Query Workspace
+AI Query Workspace | AI Database Copilot
 </title>
 
 
 <link rel="stylesheet" href="../assets/css/main.css">
-
 <link rel="stylesheet" href="../assets/css/components.css">
-
 <link rel="stylesheet" href="../assets/css/effects.css">
-
 <link rel="stylesheet" href="../assets/css/common-background.css">
+
+
+<style>
+
+.query-wrapper {
+
+    max-width:1100px;
+
+    margin:40px auto;
+
+}
+
+
+
+.query-section {
+
+    margin-bottom:25px;
+
+}
+
+
+
+.query-label {
+
+    font-weight:600;
+
+    margin-bottom:10px;
+
+    display:block;
+
+}
+
+
+
+.query-select,
+.query-textarea {
+
+    width:100%;
+
+}
+
+
+
+.query-textarea {
+
+    min-height:140px;
+
+    resize:vertical;
+
+}
+
+
+
+.query-actions {
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:20px;
+
+}
+
+
+
+.sql-box {
+
+    background:rgba(0,0,0,0.25);
+
+    padding:20px;
+
+    border-radius:14px;
+
+    overflow:auto;
+
+    white-space:pre-wrap;
+
+    font-family:monospace;
+
+}
+
+
+
+.result-table {
+
+    width:100%;
+
+    overflow-x:auto;
+
+}
+
+
+
+.result-table table {
+
+    width:100%;
+
+}
+
+
+
+.status-box {
+
+    margin-top:15px;
+
+}
+
+
+
+.hidden {
+
+    display:none;
+
+}
+
+
+
+.metric-grid {
+
+    display:grid;
+
+    grid-template-columns:repeat(
+        3,
+        1fr
+    );
+
+    gap:20px;
+
+}
+
+
+
+@media(max-width:700px){
+
+    .metric-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    .query-actions{
+
+        flex-direction:column;
+
+    }
+
+}
+
+
+</style>
 
 
 </head>
 
 
-<body>
+
+<body data-role="user">
+
 
 
 <div id="common-background"></div>
 
 
 
-<div class="page-content">
+
+
+<div class="query-wrapper page-content">
+
+
+
+
+
+
+<section class="hero">
 
 
 <h1>
@@ -40,26 +200,87 @@ AI Query Workspace
 
 
 <p>
-Generate SQL using natural language.
+Ask questions in natural language and generate secure SQL using AI.
 </p>
 
 
+</section>
 
-<div class="ui-card">
+
+
+
+
+
+
+
+
+<section class="ui-card query-section">
+
+
+<label class="query-label">
+
+Select Database
+
+</label>
+
+
+
+<select
+id="databaseSelect"
+class="input query-select">
+
+<option value="">
+
+Loading databases...
+
+</option>
+
+
+</select>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="ui-card query-section">
+
+
+<label class="query-label">
+
+Ask Your Question
+
+</label>
+
 
 
 <textarea
-class="input"
-placeholder="Ask AI about your database..."
-style="height:150px;"
+
+id="queryPrompt"
+
+class="input query-textarea"
+
+placeholder="Example: Show top 10 customers by total sales"
+
 ></textarea>
 
 
 
-<br><br>
+
+
+<div class="query-actions">
 
 
 <button
+
+id="generateSqlBtn"
+
 class="ui-btn ui-btn-primary">
 
 Generate SQL
@@ -67,7 +288,183 @@ Generate SQL
 </button>
 
 
+
 </div>
+
+
+
+<div 
+id="generateStatus"
+class="status-box">
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section 
+class="ui-card query-section hidden"
+id="sqlSection">
+
+
+<h2>
+Generated SQL
+</h2>
+
+
+
+<div 
+class="sql-box"
+id="generatedSql">
+
+</div>
+
+
+
+<p id="sqlSummary"></p>
+
+
+<p id="sqlConfidence"></p>
+
+
+
+
+
+<div class="query-actions">
+
+
+<button
+
+id="executeQueryBtn"
+
+class="ui-btn ui-btn-primary">
+
+Execute Query
+
+</button>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section 
+class="ui-card query-section hidden"
+id="resultSection">
+
+
+<h2>
+Query Result
+</h2>
+
+
+
+
+<div class="metric-grid">
+
+
+<div class="ui-card">
+
+<h4>
+Status
+</h4>
+
+<p id="executionStatus">
+-
+</p>
+
+</div>
+
+
+
+<div class="ui-card">
+
+<h4>
+Execution Time
+</h4>
+
+<p id="executionTime">
+-
+</p>
+
+</div>
+
+
+
+<div class="ui-card">
+
+<h4>
+Rows Returned
+</h4>
+
+<p id="rowsReturned">
+-
+</p>
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<br>
+
+
+
+<div class="result-table">
+
+
+<table>
+
+
+<thead id="resultHead">
+
+</thead>
+
+
+<tbody id="resultBody">
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
 
 
 
@@ -82,7 +479,18 @@ class="ui-btn ui-btn-primary">
 </a>
 
 
+
+
+
 </div>
+
+
+
+
+
+
+
+
 
 <script src="../assets/js/api.js"></script>
 
@@ -93,6 +501,9 @@ class="ui-btn ui-btn-primary">
 <script src="../assets/js/user-guard.js"></script>
 
 <script src="../assets/js/navigation.js"></script>
+
+<script src="../assets/js/query.js"></script>
+
 
 
 </body>

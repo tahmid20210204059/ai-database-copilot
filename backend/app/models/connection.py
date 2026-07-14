@@ -16,9 +16,11 @@ from sqlalchemy.orm import Mapped, mapped_column
 from ..database.base import Base
 
 
+
 class DatabaseConnection(Base):
 
     __tablename__ = "db_connections"
+
 
 
     id: Mapped[int] = mapped_column(
@@ -28,11 +30,13 @@ class DatabaseConnection(Base):
     )
 
 
+
     user_id: Mapped[int] = mapped_column(
         BigInteger,
         nullable=False,
         index=True
     )
+
 
 
     connection_name: Mapped[str] = mapped_column(
@@ -41,10 +45,12 @@ class DatabaseConnection(Base):
     )
 
 
+
     host: Mapped[str] = mapped_column(
         String(255),
         nullable=False
     )
+
 
 
     port: Mapped[int] = mapped_column(
@@ -54,11 +60,13 @@ class DatabaseConnection(Base):
     )
 
 
+
     database_name: Mapped[str] = mapped_column(
         String(120),
         nullable=False,
         index=True
     )
+
 
 
     username: Mapped[str] = mapped_column(
@@ -67,10 +75,12 @@ class DatabaseConnection(Base):
     )
 
 
+
     encrypted_password: Mapped[str] = mapped_column(
         Text,
         nullable=False
     )
+
 
 
     ssl_enabled: Mapped[bool] = mapped_column(
@@ -79,13 +89,16 @@ class DatabaseConnection(Base):
     )
 
 
+
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         server_default=text("1")
     )
 
 
+
     last_tested_at: Mapped[datetime | None]
+
 
 
     created_at: Mapped[datetime] = mapped_column(
@@ -94,8 +107,25 @@ class DatabaseConnection(Base):
     )
 
 
+
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=func.now(),
         onupdate=func.now()
     )
+
+
+
+    def get_password(self) -> str:
+        """
+        Return decrypted database password.
+        """
+
+        from ..utils.encryption import (
+            encryption_service,
+        )
+
+
+        return encryption_service.decrypt(
+            self.encrypted_password
+        )

@@ -9,50 +9,505 @@
 
 
 <title>
-Profile
+Profile | AI Database Copilot
 </title>
 
 
 <link rel="stylesheet" href="../assets/css/main.css">
-
 <link rel="stylesheet" href="../assets/css/components.css">
-
 <link rel="stylesheet" href="../assets/css/common-background.css">
+
+
+<style>
+
+.profile-wrapper {
+
+    max-width:1000px;
+
+    margin:40px auto;
+
+}
+
+
+
+.profile-header {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+
+
+.profile-avatar {
+
+    width:80px;
+
+    height:80px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+
+
+.profile-grid {
+
+    display:grid;
+
+    grid-template-columns:repeat(
+        2,
+        1fr
+    );
+
+    gap:20px;
+
+    margin-top:30px;
+
+}
+
+
+
+.profile-item {
+
+    padding:18px;
+
+}
+
+
+
+.profile-label {
+
+    font-size:13px;
+
+    opacity:.7;
+
+    margin-bottom:6px;
+
+}
+
+
+
+.profile-value {
+
+    font-size:17px;
+
+    font-weight:600;
+
+}
+
+
+
+.database-section {
+
+    margin-top:35px;
+
+}
+
+
+
+.database-header {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+
+
+.database-count {
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+
+
+.database-grid {
+
+    display:grid;
+
+    grid-template-columns:repeat(
+        2,
+        1fr
+    );
+
+    gap:20px;
+
+}
+
+
+
+.database-card {
+
+    padding:20px;
+
+}
+
+
+
+.database-card h3 {
+
+    margin-bottom:12px;
+
+}
+
+
+
+.database-card p {
+
+    margin:6px 0;
+
+}
+
+
+
+.empty-state {
+
+    text-align:center;
+
+    padding:30px;
+
+    opacity:.7;
+
+}
+
+
+
+.loading {
+
+    text-align:center;
+
+    padding:40px;
+
+}
+
+
+
+@media(max-width:700px){
+
+    .profile-grid,
+    .database-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+
+
+</style>
 
 
 </head>
 
 
-<body>
+
+<body data-role="user">
+
 
 
 <div id="common-background"></div>
 
 
 
-<div class="page-content">
+
+
+<div class="profile-wrapper page-content">
+
+
+
+
+
+<section class="hero">
 
 
 <h1>
-Profile
+My Profile
 </h1>
+
+
+<p>
+Manage your AI Database Copilot account information.
+</p>
+
+
+</section>
+
+
+
+
+
+
+
+<div class="ui-card loading" id="profileLoading">
+
+Loading profile...
+
+</div>
+
+
+
+
+
+
+
+
+<div 
+id="profileContent"
+style="display:none;">
+
+
+
+
 
 
 
 <div class="ui-card">
 
 
-<h3>
-JD User
-</h3>
+<div class="profile-header">
 
 
-<p>
-AI Database Copilot Account
+<div 
+class="profile-avatar"
+id="profileAvatar">
+
+U
+
+</div>
+
+
+
+<div>
+
+<h2 id="profileName">
+
+User
+
+</h2>
+
+
+<p id="profileEmail">
+
+email@example.com
+
 </p>
 
 
 </div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="profile-grid">
+
+
+
+
+
+<div class="ui-card profile-item">
+
+
+<div class="profile-label">
+
+Role
+
+</div>
+
+
+<div 
+class="profile-value"
+id="profileRole">
+
+User
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="ui-card profile-item">
+
+
+<div class="profile-label">
+
+Account Status
+
+</div>
+
+
+<div 
+class="profile-value"
+id="profileStatus">
+
+Active
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="ui-card profile-item">
+
+
+<div class="profile-label">
+
+Created Date
+
+</div>
+
+
+<div 
+class="profile-value"
+id="profileCreated">
+
+-
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="ui-card profile-item">
+
+
+<div class="profile-label">
+
+Last Login
+
+</div>
+
+
+<div 
+class="profile-value"
+id="profileLastLogin">
+
+-
+
+</div>
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<section class="database-section">
+
+
+
+<div class="database-header">
+
+
+<h2>
+Connected Databases
+</h2>
+
+
+<div class="database-count">
+
+<span id="databaseCount">
+0
+</span>
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div 
+class="database-grid"
+id="connectedDatabases">
+
+
+<div class="ui-card empty-state">
+
+Loading databases...
+
+</div>
+
+
+</div>
+
+
+
+
+
+</section>
+
+
+
+
+
 
 
 
@@ -67,7 +522,25 @@ class="ui-btn ui-btn-primary">
 </a>
 
 
+
+
+
 </div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
 
 <script src="../assets/js/api.js"></script>
 
@@ -78,6 +551,9 @@ class="ui-btn ui-btn-primary">
 <script src="../assets/js/user-guard.js"></script>
 
 <script src="../assets/js/navigation.js"></script>
+
+<script src="../assets/js/profile.js"></script>
+
 
 
 </body>

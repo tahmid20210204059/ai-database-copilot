@@ -3,6 +3,7 @@ import logging
 import time
 from typing import Any
 
+
 from google import genai
 
 
@@ -16,27 +17,59 @@ from ..parsers.json_parser import json_parser
 
 
 
+
 logger = logging.getLogger(__name__)
+
+
 
 
 
 
 class GeminiAIService:
     """
-    Handles Gemini AI communication.
+    Handles enterprise Gemini AI communication.
 
     Responsibilities:
-    - Create Gemini client
-    - Build prompts
-    - Generate responses
 
-    Parsing responsibility is handled by:
-    JSON Parser Layer
+    - Load modular AI prompt architecture
+    - Build production-grade prompts
+    - Provide schema context
+    - Generate SQL responses
+    - Handle Gemini communication
+    - Parse structured JSON output
+
+
+    Prompt Architecture:
+
+    system_prompt.md
+        +
+    business_rules.md
+        +
+    sql_generation_rules.md
+        +
+    output_contract.md
+        +
+    domain examples
+        +
+    schema context
+        +
+    user request
+
+        ↓
+
+    Gemini
+
+        ↓
+
+    JSON SQL Response
     """
 
 
 
+
+
     def __init__(self):
+
 
         logger.info(
             "Initializing Gemini client"
@@ -49,15 +82,23 @@ class GeminiAIService:
         )
 
 
+
         self.client = genai.Client(
+
             api_key=settings.GEMINI_API_KEY
+
         )
+
 
 
         self.model = settings.GEMINI_MODEL
 
 
+
         self.max_retries = 3
+
+
+
 
 
 
@@ -72,23 +113,43 @@ class GeminiAIService:
         """
 
 
+
         prompt = self._build_prompt(
+
             schema_context,
+
             user_prompt,
+
         )
+
+
+
 
 
         raw_response = self._call_gemini(
+
             prompt
+
         )
+
+
+
 
 
         parsed_response = json_parser.parse(
+
             raw_response
+
         )
 
 
+
+
+
         return parsed_response
+
+
+
 
 
 
@@ -99,23 +160,177 @@ class GeminiAIService:
         user_prompt: str,
     ) -> str:
         """
-        Build Gemini prompt.
+        Build modular enterprise prompt.
         """
 
 
-        template = load_prompt(
-            "generate_sql.txt"
+
+        system_prompt = load_prompt(
+
+            "system_prompt.md"
+
         )
 
 
-        return template.format(
-            schema_context=json.dumps(
-                schema_context,
-                indent=2,
-            ),
 
-            user_prompt=user_prompt,
+        business_rules = load_prompt(
+
+            "business_rules.md"
+
         )
+
+
+
+        sql_rules = load_prompt(
+
+            "sql_generation_rules.md"
+
+        )
+
+
+
+        output_contract = load_prompt(
+
+            "output_contract.md"
+
+        )
+
+
+
+        examples = self._load_examples()
+
+
+
+
+
+
+        return f"""
+
+{system_prompt}
+
+
+
+==================================================
+BUSINESS RULES
+==================================================
+
+{business_rules}
+
+
+
+==================================================
+SQL GENERATION RULES
+==================================================
+
+{sql_rules}
+
+
+
+==================================================
+OUTPUT CONTRACT
+==================================================
+
+{output_contract}
+
+
+
+==================================================
+FEW SHOT EXAMPLES
+==================================================
+
+{examples}
+
+
+
+==================================================
+DATABASE SCHEMA
+==================================================
+
+{json.dumps(
+    schema_context,
+    indent=2,
+)}
+
+
+
+==================================================
+USER REQUEST
+==================================================
+
+{user_prompt}
+
+"""
+
+
+
+
+
+
+
+
+    def _load_examples(self) -> str:
+        """
+        Load domain examples.
+
+        These examples improve business intent understanding.
+        """
+
+
+
+        example_files = [
+
+            "examples/crm_examples.md",
+
+            "examples/sales_examples.md",
+
+            "examples/inventory_examples.md",
+
+            "examples/finance_examples.md",
+
+        ]
+
+
+
+        examples = []
+
+
+
+        for file in example_files:
+
+
+            try:
+
+
+                examples.append(
+
+                    load_prompt(
+                        file
+                    )
+
+                )
+
+
+            except Exception as error:
+
+
+                logger.warning(
+
+                    "Example loading failed: %s",
+
+                    error,
+
+                )
+
+
+
+        return "\n\n".join(
+            examples
+        )
+
+
+
+
+
 
 
 
@@ -125,67 +340,122 @@ class GeminiAIService:
         prompt: str,
     ) -> str:
         """
-        Call Gemini API with retry.
+        Call Gemini API with retry mechanism.
         """
+
 
 
         last_error = None
 
 
+
+
+
         for attempt in range(
+
             1,
+
             self.max_retries + 1,
+
         ):
+
 
             try:
 
+
+
                 logger.info(
+
                     "Gemini attempt %s",
+
                     attempt,
+
                 )
 
 
-                response = self.client.models.generate_content(
-                    model=self.model,
 
-                    contents=prompt,
+
+
+                response = (
+
+                    self.client.models.generate_content(
+
+                        model=self.model,
+
+                        contents=prompt,
+
+                    )
+
                 )
+
+
+
 
 
                 if not response.text:
 
+
                     raise RuntimeError(
+
                         "Empty Gemini response"
+
                     )
+
+
+
 
 
                 return response.text
 
 
 
+
+
+
             except Exception as error:
+
 
 
                 last_error = error
 
 
+
                 logger.warning(
+
                     "Gemini attempt failed: %s",
+
                     error,
+
                 )
+
+
+
 
 
                 if attempt < self.max_retries:
 
+
                     time.sleep(
+
                         attempt * 2
+
                     )
 
 
 
+
+
+
+
+
         raise RuntimeError(
+
             f"Gemini request failed: {last_error}"
+
         )
+
+
+
 
 
 

@@ -6,7 +6,7 @@ from fastapi import (
     status,
 )
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 
@@ -56,10 +56,10 @@ def create_history(
     current_user: User = Depends(require_user),
 ):
     """
-    Save query execution history.
+    Create query execution history.
 
     User can create history only
-    for their own database connection.
+    for owned database connections.
     """
 
 
@@ -71,24 +71,36 @@ def create_history(
 
 
             connection = db.scalar(
-                select(DatabaseConnection)
+
+                select(
+                    DatabaseConnection
+                )
+
                 .where(
+
                     DatabaseConnection.id
                     ==
                     data.connection_id,
 
+
                     DatabaseConnection.user_id
                     ==
                     current_user.id,
+
                 )
+
             )
+
 
 
             if connection is None:
 
                 raise HTTPException(
+
                     status_code=status.HTTP_404_NOT_FOUND,
+
                     detail="Database connection not found",
+
                 )
 
 
@@ -106,15 +118,13 @@ def create_history(
 
 
 
-
     except HTTPException:
 
         raise
 
 
 
-
-    except Exception:
+    except Exception as error:
 
 
         raise HTTPException(
@@ -123,7 +133,10 @@ def create_history(
 
             detail="Failed to save query history",
 
-        )
+        ) from error
+
+
+
 
 
 
@@ -143,32 +156,38 @@ def get_history(
         ge=1,
     ),
 
+
     page_size: int = Query(
         20,
         ge=1,
         le=100,
     ),
 
+
     status_filter: str | None = Query(
         None,
         alias="status",
     ),
 
+
     connection_id: int | None = Query(
         None,
     ),
 
+
     db: Session = Depends(get_app_db),
+
 
     current_user: User = Depends(require_user),
 ):
     """
-    Get current user's query history only.
+    Get current user's query history.
     """
 
 
 
     try:
+
 
 
         items = history_service.get_history(
@@ -189,6 +208,19 @@ def get_history(
 
 
 
+        total_query = history_service.count_history(
+
+            db=db,
+
+            user_id=current_user.id,
+
+            status=status_filter,
+
+            connection_id=connection_id,
+
+        )
+
+
 
         return HistoryListResponse(
 
@@ -198,14 +230,13 @@ def get_history(
 
             page_size=page_size,
 
-            total=len(items),
+            total=total_query,
 
         )
 
 
 
-
-    except Exception:
+    except Exception as error:
 
 
         raise HTTPException(
@@ -214,7 +245,10 @@ def get_history(
 
             detail="Failed to retrieve history",
 
-        )
+        ) from error
+
+
+
 
 
 
@@ -236,9 +270,7 @@ def get_history_by_id(
     current_user: User = Depends(require_user),
 ):
     """
-    Get single history record.
-
-    User can access only own history.
+    Get single owned history record.
     """
 
 
@@ -255,7 +287,6 @@ def get_history_by_id(
 
 
 
-
     if history is None:
 
 
@@ -269,8 +300,9 @@ def get_history_by_id(
 
 
 
-
     return history
+
+
 
 
 
@@ -292,7 +324,7 @@ def delete_history(
     current_user: User = Depends(require_user),
 ):
     """
-    Delete only user's own history record.
+    Delete owned history record.
     """
 
 
@@ -309,7 +341,6 @@ def delete_history(
 
 
 
-
     if not deleted:
 
 
@@ -320,7 +351,6 @@ def delete_history(
             detail="History record not found",
 
         )
-
 
 
 
@@ -349,7 +379,7 @@ def clear_history(
     current_user: User = Depends(require_user),
 ):
     """
-    Delete all current user's history.
+    Clear all current user's history.
     """
 
 
@@ -361,7 +391,6 @@ def clear_history(
         user_id=current_user.id,
 
     )
-
 
 
 

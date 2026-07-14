@@ -3,6 +3,7 @@ import logging
 from sqlalchemy import (
     delete,
     select,
+    func,
 )
 
 from sqlalchemy.orm import Session
@@ -35,13 +36,14 @@ class HistoryService:
 
     Responsibilities:
     - Create query history
-    - Retrieve user history
-    - Delete user history
+    - Retrieve user scoped history
+    - Count history records
+    - Delete history records
 
     Security:
-    - All operations are user scoped
-    - Ownership validation handled before creation
+    - Every operation is user scoped
     """
+
 
 
 
@@ -93,23 +95,17 @@ class HistoryService:
 
 
 
-            db.add(
-                history
-            )
-
+            db.add(history)
 
             db.commit()
 
-
-            db.refresh(
-                history
-            )
+            db.refresh(history)
 
 
 
             logger.info(
 
-                "Query history created. user_id=%s history_id=%s",
+                "Query history created user_id=%s history_id=%s",
 
                 user_id,
 
@@ -125,6 +121,7 @@ class HistoryService:
 
 
 
+
         except Exception as error:
 
 
@@ -132,18 +129,20 @@ class HistoryService:
 
 
 
-            logger.error(
+            logger.exception(
 
-                "History creation failed. user_id=%s error=%s",
+                "History creation failed user_id=%s",
 
                 user_id,
-
-                error,
 
             )
 
 
-            raise
+            raise error
+
+
+
+
 
 
 
@@ -166,12 +165,17 @@ class HistoryService:
 
 
 
-        query = (
-            select(QueryHistory)
-            .where(
-                QueryHistory.user_id == user_id
-            )
+        query = select(
+            QueryHistory
+        ).where(
+
+            QueryHistory.user_id
+            ==
+            user_id
+
         )
+
+
 
 
 
@@ -185,6 +189,7 @@ class HistoryService:
                 status
 
             )
+
 
 
 
@@ -246,6 +251,84 @@ class HistoryService:
 
 
 
+
+
+
+
+    def count_history(
+        self,
+        db: Session,
+        user_id: int,
+        status: str | None = None,
+        connection_id: int | None = None,
+    ) -> int:
+        """
+        Count total history records
+        for pagination.
+        """
+
+
+
+        query = select(
+            func.count(
+                QueryHistory.id
+            )
+        ).where(
+
+            QueryHistory.user_id
+            ==
+            user_id
+
+        )
+
+
+
+
+
+        if status:
+
+
+            query = query.where(
+
+                QueryHistory.status
+                ==
+                status
+
+            )
+
+
+
+
+
+        if connection_id is not None:
+
+
+            query = query.where(
+
+                QueryHistory.connection_id
+                ==
+                connection_id
+
+            )
+
+
+
+
+
+        return db.scalar(
+            query
+        ) or 0
+
+
+
+
+
+
+
+
+
+
+
     def get_history_by_id(
         self,
         db: Session,
@@ -259,22 +342,18 @@ class HistoryService:
 
 
 
-        query = (
+        query = select(
+            QueryHistory
+        ).where(
 
-            select(QueryHistory)
-
-            .where(
-
-                QueryHistory.id
-                ==
-                history_id,
+            QueryHistory.id
+            ==
+            history_id,
 
 
-                QueryHistory.user_id
-                ==
-                user_id,
-
-            )
+            QueryHistory.user_id
+            ==
+            user_id,
 
         )
 
@@ -287,6 +366,10 @@ class HistoryService:
 
 
         return result.scalar_one_or_none()
+
+
+
+
 
 
 
@@ -318,11 +401,11 @@ class HistoryService:
 
 
 
+
+
         if record is None:
 
-
             return False
-
 
 
 
@@ -339,7 +422,7 @@ class HistoryService:
 
         logger.info(
 
-            "History deleted. user_id=%s history_id=%s",
+            "History deleted user_id=%s history_id=%s",
 
             user_id,
 
@@ -350,6 +433,10 @@ class HistoryService:
 
 
         return True
+
+
+
+
 
 
 
@@ -368,17 +455,13 @@ class HistoryService:
 
 
 
-        query = (
+        query = delete(
+            QueryHistory
+        ).where(
 
-            delete(QueryHistory)
-
-            .where(
-
-                QueryHistory.user_id
-                ==
-                user_id
-
-            )
+            QueryHistory.user_id
+            ==
+            user_id
 
         )
 
@@ -395,7 +478,7 @@ class HistoryService:
 
         logger.info(
 
-            "All history cleared. user_id=%s deleted=%s",
+            "All history cleared user_id=%s deleted=%s",
 
             user_id,
 
@@ -406,6 +489,11 @@ class HistoryService:
 
 
         return result.rowcount
+
+
+
+
+
 
 
 

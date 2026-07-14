@@ -1,27 +1,49 @@
 from datetime import datetime
 
 from sqlalchemy import select
+
 from sqlalchemy.exc import IntegrityError
+
 from sqlalchemy.orm import Session
+
 
 from ..database.dynamic_engine import (
     create_dynamic_engine,
     test_database_connection,
 )
 
-from ..models.connection import DatabaseConnection
+from ..models.connection import (
+    DatabaseConnection,
+)
 
-from ..utils.encryption import encryption_service
+from ..utils.encryption import (
+    encryption_service,
+)
+
+
+
 
 
 class DuplicateConnectionError(Exception):
-    """Raised when a user tries to save a duplicate connection name."""
+    """
+    Raised when duplicate connection exists.
+    """
+
+
+
+
+
 
 
 class ConnectionService:
     """
     Handles database connection operations.
     """
+
+
+
+
+
 
     def test_connection(
         self,
@@ -31,19 +53,30 @@ class ConnectionService:
         username: str,
         password: str,
     ) -> dict:
-        """
-        Test external database connection.
-        """
+
 
         engine = create_dynamic_engine(
+
             host=host,
+
             port=port,
+
             database_name=database_name,
+
             username=username,
+
             password=password,
+
         )
 
-        return test_database_connection(engine)
+
+        return test_database_connection(
+            engine
+        )
+
+
+
+
 
 
 
@@ -53,10 +86,7 @@ class ConnectionService:
         user_id: int,
         connection_data,
     ):
-        """
-        Save user database connection.
-        Password will be encrypted.
-        """
+
 
         encrypted_password = (
             encryption_service.encrypt(
@@ -65,55 +95,81 @@ class ConnectionService:
         )
 
 
+
         new_connection = DatabaseConnection(
 
+
             user_id=user_id,
+
 
             connection_name=
             connection_data.connection_name,
 
+
             host=
             connection_data.host,
+
 
             port=
             connection_data.port,
 
+
             database_name=
             connection_data.database_name,
+
 
             username=
             connection_data.username,
 
+
             encrypted_password=
             encrypted_password,
+
 
             ssl_enabled=
             connection_data.ssl_enabled,
 
+
             last_tested_at=
             datetime.now(),
+
 
         )
 
 
+
         try:
 
-            database.add(new_connection)
+
+            database.add(
+                new_connection
+            )
+
 
             database.commit()
 
-            database.refresh(new_connection)
+
+            database.refresh(
+                new_connection
+            )
+
 
             return new_connection
 
 
+
         except IntegrityError as exc:
 
+
             database.rollback()
+
 
             raise DuplicateConnectionError(
                 "Connection with this name already exists"
             ) from exc
+
+
+
 
 
 
@@ -124,17 +180,78 @@ class ConnectionService:
         user_id: int,
     ):
 
+
         query = (
-            select(DatabaseConnection)
+
+            select(
+                DatabaseConnection
+            )
+
             .where(
-                DatabaseConnection.user_id == user_id
+
+                DatabaseConnection.user_id
+                ==
+                user_id
+
             )
+
             .order_by(
+
                 DatabaseConnection.created_at.desc()
+
             )
+
         )
 
-        return database.scalars(query).all()
+
+
+        return database.scalars(
+            query
+        ).all()
+
+
+
+
+
+
+
+    def get_owned_connection(
+        self,
+        database: Session,
+        connection_id: int,
+        user_id: int,
+    ):
+
+
+        query = (
+
+            select(
+                DatabaseConnection
+            )
+
+            .where(
+
+                DatabaseConnection.id
+                ==
+                connection_id,
+
+
+                DatabaseConnection.user_id
+                ==
+                user_id,
+
+            )
+
+        )
+
+
+
+        return database.scalar(
+            query
+        )
+
+
+
 
 
 
@@ -148,16 +265,17 @@ class ConnectionService:
         connection_data,
     ):
 
-        query = (
-            select(DatabaseConnection)
-            .where(
-                DatabaseConnection.id == connection_id,
-                DatabaseConnection.user_id == user_id,
-            )
+
+        connection = self.get_owned_connection(
+
+            database,
+
+            connection_id,
+
+            user_id,
+
         )
 
-
-        connection = database.scalar(query)
 
 
         if connection is None:
@@ -166,25 +284,32 @@ class ConnectionService:
 
 
 
+
+
         connection.connection_name = (
             connection_data.connection_name
         )
+
 
         connection.host = (
             connection_data.host
         )
 
+
         connection.port = (
             connection_data.port
         )
+
 
         connection.database_name = (
             connection_data.database_name
         )
 
+
         connection.username = (
             connection_data.username
         )
+
 
         connection.encrypted_password = (
             encryption_service.encrypt(
@@ -192,12 +317,15 @@ class ConnectionService:
             )
         )
 
+
         connection.ssl_enabled = (
             connection_data.ssl_enabled
         )
 
 
+
         database.commit()
+
 
         database.refresh(
             connection
@@ -210,6 +338,8 @@ class ConnectionService:
 
 
 
+
+
     def delete_connection(
         self,
         database: Session,
@@ -217,16 +347,17 @@ class ConnectionService:
         user_id: int,
     ):
 
-        query = (
-            select(DatabaseConnection)
-            .where(
-                DatabaseConnection.id == connection_id,
-                DatabaseConnection.user_id == user_id,
-            )
+
+        connection = self.get_owned_connection(
+
+            database,
+
+            connection_id,
+
+            user_id,
+
         )
 
-
-        connection = database.scalar(query)
 
 
         if connection is None:
@@ -235,12 +366,18 @@ class ConnectionService:
 
 
 
-        database.delete(connection)
+
+        database.delete(
+            connection
+        )
+
 
         database.commit()
 
 
+
         return True
+
 
 
 

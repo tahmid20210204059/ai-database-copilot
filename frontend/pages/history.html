@@ -7,29 +7,159 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <title>
-Query History
+Query History | AI Database Copilot
 </title>
 
 
 <link rel="stylesheet" href="../assets/css/main.css">
-
 <link rel="stylesheet" href="../assets/css/components.css">
-
 <link rel="stylesheet" href="../assets/css/common-background.css">
+
+
+<style>
+
+.history-wrapper {
+
+    max-width:1100px;
+
+    margin:40px auto;
+
+}
+
+
+
+.history-grid {
+
+    display:grid;
+
+    grid-template-columns:repeat(
+        3,
+        1fr
+    );
+
+    gap:20px;
+
+    margin:30px 0;
+
+}
+
+
+
+.history-card {
+
+    padding:20px;
+
+}
+
+
+
+.history-title {
+
+    font-size:14px;
+
+    opacity:.7;
+
+}
+
+
+
+.history-value {
+
+    font-size:28px;
+
+    font-weight:700;
+
+    margin-top:8px;
+
+}
+
+
+
+.status-success {
+
+    color:#22c55e;
+
+}
+
+
+
+.status-failed {
+
+    color:#ef4444;
+
+}
+
+
+
+.table-wrapper {
+
+    overflow-x:auto;
+
+}
+
+
+
+.empty-state {
+
+    text-align:center;
+
+    padding:40px;
+
+    opacity:.7;
+
+}
+
+
+
+.loading-state {
+
+    text-align:center;
+
+    padding:30px;
+
+}
+
+
+
+@media(max-width:700px){
+
+    .history-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+
+</style>
 
 
 </head>
 
 
-<body>
+
+
+<body data-role="user">
+
 
 
 <div id="common-background"></div>
 
 
 
-<div class="page-content">
+
+
+<div class="history-wrapper page-content">
+
+
+
+
+
+
+<section class="hero">
 
 
 <h1>
@@ -37,12 +167,120 @@ Query History
 </h1>
 
 
+<p>
+Review your previous AI generated SQL operations.
+</p>
 
-<div class="ui-card table-wrapper">
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="history-grid">
+
+
+
+<div class="ui-card history-card">
+
+
+<div class="history-title">
+
+Total Queries
+
+</div>
+
+
+<div 
+class="history-value"
+id="totalQueries">
+
+0
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="ui-card history-card">
+
+
+<div class="history-title">
+
+Successful Queries
+
+</div>
+
+
+<div 
+class="history-value"
+id="successQueries">
+
+0
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="ui-card history-card">
+
+
+<div class="history-title">
+
+Failed Queries
+
+</div>
+
+
+<div 
+class="history-value"
+id="failedQueries">
+
+0
+
+</div>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="ui-card table-wrapper">
+
 
 
 <table>
 
+
+<thead>
 
 <tr>
 
@@ -51,46 +289,65 @@ Prompt
 </th>
 
 <th>
+Generated SQL
+</th>
+
+<th>
 Status
 </th>
 
 <th>
-Time
+Execution Time
+</th>
+
+<th>
+Rows
+</th>
+
+<th>
+Date
 </th>
 
 </tr>
 
 
+</thead>
+
+
+
+
+
+<tbody id="historyTableBody">
+
 
 <tr>
 
-<td>
-Show customers
-</td>
+<td 
+colspan="6"
+class="loading-state">
 
-
-<td>
-
-<span class="badge badge-success">
-Success
-</span>
+Loading history...
 
 </td>
-
-
-<td>
-1.2s
-</td>
-
 
 </tr>
+
+
+</tbody>
+
 
 
 
 </table>
 
 
-</div>
+
+</section>
+
+
+
+
+
 
 
 
@@ -105,7 +362,19 @@ class="ui-btn ui-btn-primary">
 </a>
 
 
+
+
+
+
 </div>
+
+
+
+
+
+
+
+
 
 <script src="../assets/js/api.js"></script>
 
@@ -116,6 +385,9 @@ class="ui-btn ui-btn-primary">
 <script src="../assets/js/user-guard.js"></script>
 
 <script src="../assets/js/navigation.js"></script>
+
+<script src="../assets/js/history.js"></script>
+
 
 
 </body>

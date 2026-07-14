@@ -19,10 +19,13 @@ logger = logging.getLogger(__name__)
 
 
 
+
 class QueryExecutionError(Exception):
     """
-    Base execution exception.
+    Query execution related exception.
     """
+
+
 
 
 
@@ -32,17 +35,20 @@ class QueryExecutor:
     Executes validated read-only SQL queries.
 
     Responsibilities:
-    - Accept validated SQL only
-    - Execute SELECT queries
-    - Format results
-    - Measure execution time
+    - Execute validated SELECT queries
+    - Create dynamic database connection
+    - Format query results
+    - Track execution performance
 
     Does NOT:
     - Generate SQL
     - Validate SQL
     - Modify SQL
-    - Access Gemini
+    - Handle Gemini operations
     """
+
+
+
 
 
 
@@ -56,21 +62,26 @@ class QueryExecutor:
         password: str,
     ) -> QueryExecutionResponse:
         """
-        Execute validated SQL query.
+        Execute a validated SQL query.
         """
 
+
+
         start_time = time.perf_counter()
+
+
 
 
 
         if not validation_result.is_valid:
 
             logger.warning(
-                "Execution blocked: SQL validation failed"
+                "Query execution blocked. SQL validation failed."
             )
 
 
             return QueryExecutionResponse(
+
                 success=False,
 
                 sql_executed=None,
@@ -78,10 +89,17 @@ class QueryExecutor:
                 message="SQL validation failed",
 
                 metadata={
+
                     "reason":
                     validation_result.reason
+
                 },
+
             )
+
+
+
+
 
 
 
@@ -89,21 +107,41 @@ class QueryExecutor:
 
 
 
+
+
         if not sql:
 
             return QueryExecutionResponse(
+
                 success=False,
 
-                message="No SQL provided for execution",
+                sql_executed=None,
+
+                message="No SQL query provided",
+
+                metadata={},
+
             )
+
+
+
+
+
+
+
+
+        engine = None
 
 
 
         try:
 
+
             logger.info(
-                "Query execution started"
+                "Starting query execution."
             )
+
+
 
 
 
@@ -123,6 +161,10 @@ class QueryExecutor:
 
 
 
+
+
+
+
             with engine.connect() as connection:
 
 
@@ -131,7 +173,9 @@ class QueryExecutor:
                 )
 
 
+
                 rows = result.fetchall()
+
 
 
                 columns = list(
@@ -140,11 +184,7 @@ class QueryExecutor:
 
 
 
-            execution_time = (
-                time.perf_counter()
-                -
-                start_time
-            ) * 1000
+
 
 
 
@@ -158,10 +198,36 @@ class QueryExecutor:
 
 
 
+
+
+
+            execution_time = (
+
+                time.perf_counter()
+
+                -
+
+                start_time
+
+            ) * 1000
+
+
+
+
+
+
+
             logger.info(
-                "Query execution completed %.2f ms",
+
+                "Query completed successfully. Time: %.3f ms",
+
                 execution_time,
+
             )
+
+
+
+
 
 
 
@@ -180,37 +246,67 @@ class QueryExecutor:
                 ),
 
                 execution_time_ms=
+
                     round(
+
                         execution_time,
+
                         3,
+
                     ),
 
-                message=
-                    "Query executed successfully",
+
+                message="Query executed successfully",
+
 
                 metadata={
+
                     "database":
                     database_name,
+
+                    "execution_type":
+                    "read_only",
+
                 },
+
             )
+
+
+
+
+
 
 
 
         except Exception as error:
 
 
+
             execution_time = (
+
                 time.perf_counter()
+
                 -
+
                 start_time
+
             ) * 1000
 
 
 
-            logger.error(
+
+
+            logger.exception(
+
                 "Query execution failed: %s",
+
                 error,
+
             )
+
+
+
+
 
 
             return QueryExecutionResponse(
@@ -219,20 +315,52 @@ class QueryExecutor:
 
                 sql_executed=sql,
 
+                columns=[],
+
+                rows=[],
+
+                row_count=0,
+
                 execution_time_ms=
+
                     round(
+
                         execution_time,
+
                         3,
+
                     ),
 
-                message=
-                    "Query execution failed",
+
+                message="Query execution failed",
+
 
                 metadata={
+
                     "database":
                     database_name,
+
+                    "error":
+                    str(error),
+
                 },
+
             )
+
+
+
+
+
+
+
+        finally:
+
+
+            if engine:
+
+                engine.dispose()
+
+
 
 
 
