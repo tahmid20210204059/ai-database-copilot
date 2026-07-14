@@ -1,3 +1,13 @@
+# AI Database Copilot
+
+AI Database Copilot is an intelligent Text-to-SQL assistant designed to simplify database interaction through natural language.
+
+Users can connect databases, ask business questions in plain English, generate SQL queries using Gemini AI, execute secure read-only queries, and view results instantly with query history tracking.
+
+The project focuses on solving a real-world problem: enabling non-technical users to access and analyze relational database information without requiring SQL expertise.
+
+Built using FastAPI, Gemini AI, MySQL, and modern frontend technologies.
+
 ## Demo
 
 The demo shows the core AI Query workflow of AI Database Copilot.
